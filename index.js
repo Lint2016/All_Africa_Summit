@@ -1,0 +1,199 @@
+document.addEventListener('DOMContentLoaded', function() {
+    // Mobile Navigation Toggle
+    const hamburger = document.querySelector('.hamburger');
+    const navLinks = document.querySelector('.nav-links');
+    
+    if (hamburger) {
+        hamburger.addEventListener('click', function() {
+            this.classList.toggle('active');
+            navLinks.classList.toggle('active');
+        });
+    }
+
+    // Close mobile menu when clicking a nav link
+    const navItems = document.querySelectorAll('.nav-links a');
+    navItems.forEach(item => {
+        item.addEventListener('click', () => {
+            if (window.innerWidth <= 768) {
+                hamburger.classList.remove('active');
+                navLinks.classList.remove('active');
+            }
+        });
+    });
+
+    // Navbar scroll effect
+    const navbar = document.querySelector('.navbar');
+    window.addEventListener('scroll', () => {
+        if (window.scrollY > 50) {
+            navbar.classList.add('scrolled');
+        } else {
+            navbar.classList.remove('scrolled');
+        }
+    });
+
+    // Back to top button
+    const backToTopBtn = document.getElementById('backToTop');
+    window.addEventListener('scroll', () => {
+        if (window.pageYOffset > 300) {
+            backToTopBtn.classList.add('visible');
+        } else {
+            backToTopBtn.classList.remove('visible');
+        }
+    });
+
+    backToTopBtn.addEventListener('click', () => {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    });
+
+    // Countdown Timer
+    const countdown = () => {
+        const countDate = new Date('February 25, 2026 09:00:00').getTime();
+        const now = new Date().getTime();
+        const gap = countDate - now;
+
+        // Time calculations
+        const second = 1000;
+        const minute = second * 60;
+        const hour = minute * 60;
+        const day = hour * 24;
+
+        // Calculate remaining time
+        const textDay = Math.floor(gap / day);
+        const textHour = Math.floor((gap % day) / hour);
+        const textMinute = Math.floor((gap % hour) / minute);
+        const textSecond = Math.floor((gap % minute) / second);
+
+        // Update the countdown display
+        document.getElementById('days').textContent = textDay.toString().padStart(2, '0');
+        document.getElementById('hours').textContent = textHour.toString().padStart(2, '0');
+        document.getElementById('minutes').textContent = textMinute.toString().padStart(2, '0');
+        document.getElementById('seconds').textContent = textSecond.toString().padStart(2, '0');
+    };
+
+    // Run countdown every second
+    setInterval(countdown, 1000);
+    countdown(); // Initial call
+
+    // Tab functionality for schedule
+    const scheduleTabs = document.querySelectorAll('.schedule-tabs .tab-btn');
+    scheduleTabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            const target = tab.getAttribute('data-day');
+            
+            // Remove active class from all tabs and contents
+            document.querySelectorAll('.schedule-tabs .tab-btn').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.schedule-tabs .tab-content').forEach(c => c.classList.remove('active'));
+            
+            // Add active class to clicked tab and corresponding content
+            tab.classList.add('active');
+            document.getElementById(target).classList.add('active');
+        });
+    });
+
+    // Tab functionality for sermons
+    const sermonTabs = document.querySelectorAll('.sermon-tabs .tab-btn');
+    sermonTabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            const target = tab.getAttribute('data-tab');
+            
+            // Remove active class from all tabs and contents
+            document.querySelectorAll('.sermon-tabs .tab-btn').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.sermon-tabs .tab-content').forEach(c => c.classList.remove('active'));
+            
+            // Add active class to clicked tab and corresponding content
+            tab.classList.add('active');
+            document.getElementById(target).classList.add('active');
+        });
+    });
+
+    // Audio Player Functionality
+    const audioPlayers = document.querySelectorAll('.audio-player');
+    
+    audioPlayers.forEach(player => {
+        const audio = player.querySelector('audio');
+        const playBtn = player.querySelector('.play-btn');
+        const progressBar = player.querySelector('.progress-bar');
+        const timeEl = player.querySelector('.time');
+        
+        // Format time in seconds to MM:SS
+        const formatTime = (seconds) => {
+            const minutes = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        };
+        
+        // Update progress bar and time
+        const updateProgress = () => {
+            const { currentTime, duration } = audio;
+            const progressPercent = (currentTime / duration) * 100;
+            progressBar.style.width = `${progressPercent}%`;
+            
+            const remainingTime = duration - currentTime;
+            timeEl.textContent = `${formatTime(currentTime)} / ${formatTime(duration)}`;
+        };
+        
+        // Play/Pause functionality
+        playBtn.addEventListener('click', () => {
+            if (audio.paused) {
+                // Pause all other audio players
+                document.querySelectorAll('audio').forEach(a => {
+                    if (a !== audio) {
+                        a.pause();
+                        a.previousElementSibling.querySelector('.play-btn').classList.remove('playing');
+                    }
+                });
+                
+                audio.play();
+                playBtn.classList.add('playing');
+            } else {
+                audio.pause();
+                playBtn.classList.remove('playing');
+            }
+        });
+        
+        // Update progress bar as audio plays
+        audio.addEventListener('timeupdate', updateProgress);
+        
+        // Update progress bar on click
+        const progressContainer = player.querySelector('.progress-container');
+        progressContainer.addEventListener('click', (e) => {
+            const width = progressContainer.clientWidth;
+            const clickX = e.offsetX;
+            const duration = audio.duration;
+            audio.currentTime = (clickX / width) * duration;
+        });
+        
+        // Reset play button when audio ends
+        audio.addEventListener('ended', () => {
+            playBtn.classList.remove('playing');
+            progressBar.style.width = '0%';
+            timeEl.textContent = '00:00 / 00:00';
+        });
+        
+        // Initialize time display
+        audio.addEventListener('loadedmetadata', () => {
+            timeEl.textContent = `00:00 / ${formatTime(audio.duration)}`;
+        });
+    });
+
+    // Smooth scrolling for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            const targetId = this.getAttribute('href');
+            if (targetId === '#') return;
+            
+            const targetElement = document.querySelector(targetId);
+            if (targetElement) {
+                window.scrollTo({
+                    top: targetElement.offsetTop - 80,
+                    behavior: 'smooth'
+                });
+            }
+        });
+    });
+});
