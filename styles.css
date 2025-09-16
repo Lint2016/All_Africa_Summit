@@ -333,7 +333,7 @@ img {
 .hero {
   height: 100vh;
   min-height: 700px;
-  background-image: linear-gradient(rgba(39, 31, 65, 0.3), rgba(39, 31, 65, 0.3)), url('../images/AA_summit.jpg');
+  background-image: linear-gradient(rgba(39, 31, 65, 0.3), rgba(39, 31, 65, 0.3)), url('images/aaapic.jpg');
   background-size: contain;
   background-position: center 30%;
   background-repeat: no-repeat;
