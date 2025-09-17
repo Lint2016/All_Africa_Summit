@@ -10,6 +10,9 @@
   --transition: all 0.3s ease;
   --border-radius: 8px;
   --box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  --nav-height-mobile: 70px;   /* Standard mobile navbar height */
+  /* Default hero image; update this to point to any file in images/ */
+  --hero-image: url('images/aaalogo-removebg-preview.png');
 }
 
 * {
@@ -356,9 +359,10 @@ img {
       rgba(39, 31, 65, 0.55) 60%,      /* transition into deep purple */
       rgba(39, 31, 65, 0.15) 100%
     ),
-    url('images/aaapic.jpg');
-  background-size: contain;
-  background-position: center 30%;
+    var(--hero-image);
+  /* Keep gradient full size, image at 50% and centered */
+  background-size: 100% 100%, 50% auto;
+  background-position: center center;
   background-repeat: no-repeat;
   display: flex;
   align-items: center;
@@ -391,7 +395,75 @@ img {
   padding: 0 20px;
 }
 
+/* What to Expect: card-style panel and items */
+.expect {
+  background: linear-gradient(180deg, rgba(25,19,42,0.95) 0%, rgba(25,19,42,0.85) 100%);
+  border-top: 1px solid rgba(222, 204, 162, 0.08);
+  border-bottom: 1px solid rgba(222, 204, 162, 0.08);
+}
+.expect .section-title { color: var(--color-accent); }
+
+.expect .features {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px 18px;
+  margin-top: 18px;
+  background: rgba(17, 12, 26, 0.45);
+  border: 1px solid rgba(222, 204, 162, 0.12);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+  backdrop-filter: blur(6px);
+}
+
+.expect .feature {
+  color: var(--color-accent);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 500;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(222, 204, 162, 0.10);
+  border-radius: 10px;
+  padding: 12px 14px;
+  transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+}
+
+.expect .feature:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 18px rgba(0,0,0,0.2);
+  border-color: rgba(222, 204, 162, 0.22);
+}
+
+.feature-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(222, 204, 162, 0.08);
+  color: var(--color-secondary);
+  font-size: 1rem;
+  filter: drop-shadow(0 2px 6px rgba(0,0,0,0.35));
+}
+
+@media (max-width: 576px) {
+  .expect .features { grid-template-columns: 1fr; gap: 10px 0; padding: 16px; }
+}
+
+/* Hero Logo and subtitle (reference layout) */
+.hero-logo {
+  width: 90px;
+  height: auto;
+  margin: 0 auto 16px;
+  display: block;
+  filter: drop-shadow(0 4px 10px rgba(0,0,0,0.4));
+}
+
 .hero h1 {
+  font-family: 'Playfair Display', serif;
+  font-weight: 800;
   font-size: 4rem;
   margin-bottom: 20px;
   color: white;
@@ -1036,8 +1108,12 @@ img {
   }
   
   .hero {
+    margin-top: 0; /* remove extra gap */
     min-height: 600px;
-    padding-top: 70px;
+    padding-top: calc(var(--nav-height-mobile) - 16px); /* tighter spacing under navbar */
+    /* Make the image larger on mobile */
+    background-size: 100% 100%, 70% auto;
+    background-position: center 25%;
   }
   
   .hero h1 {
