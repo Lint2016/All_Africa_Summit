@@ -340,7 +340,7 @@ img {
   display: block;
   width: 25px;
   height: 3px;
-  background-color: var(--color-primary);
+  background-color: var(--color-accent);
   transition: var(--transition);
 }
 
@@ -979,6 +979,35 @@ img {
   
   .hamburger {
     display: flex;
+    position: absolute;
+    right: 20px;
+    padding-top: 2rem;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 1002; /* above centered logo */
+  }
+  
+  /* Center the logo text on mobile while keeping the hamburger accessible */
+  .navbar .container { position: fixed; }
+  .logo {
+    position: absolute;
+    padding-left: 23rem;
+    padding-top: 7rem;
+    transform: translateX(-50%);
+    text-align: center;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap; 
+  }
+  
+  .logo span { 
+    display: block; 
+    text-align: center; 
+    color: var(--color-accent); 
+    align-items: center;
+    padding-left: 2rem;
+    white-space: nowrap;
   }
   
   .nav-links {
