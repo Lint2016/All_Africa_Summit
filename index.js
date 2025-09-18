@@ -125,27 +125,34 @@ document.addEventListener('DOMContentLoaded', function() {
             return `${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
         };
         
-        // Update progress bar and time
+        // Update progress bar and time (guard against metadata not loaded)
         const updateProgress = () => {
             const { currentTime, duration } = audio;
+            if (!isFinite(duration) || duration === 0) {
+                progressBar.style.width = '0%';
+                timeEl.textContent = `${formatTime(currentTime || 0)} / 00:00`;
+                return;
+            }
             const progressPercent = (currentTime / duration) * 100;
             progressBar.style.width = `${progressPercent}%`;
-            
-            const remainingTime = duration - currentTime;
             timeEl.textContent = `${formatTime(currentTime)} / ${formatTime(duration)}`;
         };
         
         // Play/Pause functionality
         playBtn.addEventListener('click', () => {
             if (audio.paused) {
-                // Pause all other audio players
-                document.querySelectorAll('audio').forEach(a => {
-                    if (a !== audio) {
-                        a.pause();
-                        a.previousElementSibling.querySelector('.play-btn').classList.remove('playing');
+                // Pause all other audio players and reset their buttons
+                document.querySelectorAll('.audio-player').forEach(p => {
+                    const aEl = p.querySelector('audio');
+                    const btnEl = p.querySelector('.play-btn');
+                    if (aEl !== audio) {
+                        aEl.pause();
+                        btnEl && btnEl.classList.remove('playing');
+                        const pb = p.querySelector('.progress-bar');
+                        if (pb) pb.style.width = '0%';
                     }
                 });
-                
+
                 audio.play();
                 playBtn.classList.add('playing');
             } else {
@@ -176,6 +183,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Initialize time display
         audio.addEventListener('loadedmetadata', () => {
             timeEl.textContent = `00:00 / ${formatTime(audio.duration)}`;
+            progressBar.style.width = '0%';
         });
     });
 

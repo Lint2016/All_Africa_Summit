@@ -812,6 +812,21 @@ img {
   gap: 15px;
 }
 
+/* Download button inside audio controls */
+.download-btn {
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  text-transform: none;
+  letter-spacing: 0.2px;
+  margin-left: auto; /* push to the right */
+}
+
+@media (max-width: 576px) {
+  .audio-controls { flex-wrap: wrap; gap: 10px; }
+  .download-btn { width: 100%; text-align: center; margin-left: 0; }
+}
+
 .play-btn {
   width: 40px;
   height: 40px;
