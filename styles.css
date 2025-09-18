@@ -476,7 +476,7 @@ img {
   font-weight: 50;
   font-size: 2rem;
   margin-bottom: 20px;
-  color: white;
+  color: var(--color-accent);
   text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
   animation: fadeInUp 1s ease;
 }
@@ -879,7 +879,7 @@ img {
 }
 
 .footer-logo h3 {
-  color: white;
+  color: var(--color-accent);
   margin-bottom: 20px;
   font-size: 1.5rem;
 }
@@ -892,7 +892,7 @@ img {
 
 .footer-links h4,
 .footer-contact h4 {
-  color: white;
+  color: var(--color-accent);
   margin-bottom: 25px;
   font-size: 1.2rem;
   position: relative;
@@ -920,7 +920,7 @@ img {
 }
 
 .footer-links a {
-  color: #ddd;
+  color: var(--color-accent);
   transition: var(--transition);
   display: inline-block;
 }
@@ -932,7 +932,7 @@ img {
 
 .footer-contact p {
   margin-bottom: 15px;
-  color: #ddd;
+  color: var(--color-accent);
   display: flex;
   align-items: center;
 }
@@ -977,7 +977,7 @@ img {
   border-top: 1px solid rgba(255, 255, 255, 0.1);
   padding: 20px 0;
   text-align: center;
-  color: #aaa;
+  color: var(--color-accent);
   font-size: 0.9rem;
 }
 
@@ -1126,7 +1126,7 @@ img {
   }
   
   .nav-links a {
-    color: var(--color-text);
+    color: var(--color-accent);
     font-size: 1.1rem;
     padding: 10px 0;
     display: block;
