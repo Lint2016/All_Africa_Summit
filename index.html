@@ -92,7 +92,7 @@
             <h1>All Africa Apostolic Summit 2026</h1>
             <p class="hero-subtitle"><strong>February 25-27</strong> • Johannesburg, South Africa</p>
             <div class="cta-buttons">
-                <a href="#registration" class="btn btn-primary">Register Now</a>
+                <a href="#registration" class="btn btn-primary" id="registerBtn">Register Now</a>
                 <a href="#schedule" class="btn btn-secondary">View Schedule</a>
             </div>
             <div id="countdown" class="countdown">
@@ -461,6 +461,45 @@
 
     <!-- Back to Top Button -->
     <button id="backToTop" class="back-to-top" aria-label="Back to top">↑</button>
+
+    <!---Modal linked to register now button-->
+ 
+<div class="modal" id="paymentModal">
+  <div class="modal-content">
+    <span class="close" id="closeModal">&times;</span>
+    <h2><span class="lock">🔒</span> Register for Event</h2>
+    <p class="subtitle">Choose your payment method</p>
+
+    <div class="payment-options">
+      
+      <!-- PayPal Option -->
+      <div class="payment-card paypal">
+        <img src="https://www.paypalobjects.com/webstatic/icon/pp258.png" alt="PayPal Logo">
+        <p>Pay securely with PayPal</p>
+        <button class="cta paypal-btn">Continue with PayPal</button>
+      </div>
+
+      <!-- Bank Option -->
+      <div class="payment-card bank">
+        <img src="images/bank_logo.jpeg" alt="Bank Icon">
+        <p>Transfer directly to our event account</p>
+        <button class="cta bank-btn"  id="toggleBank">View Bank Details</button>
+        <!-- Hidden bank details panel -->
+        <div class="bank-details" id="bankDetails">
+          <p><strong>Account Name:</strong> Teleios Cheque Account</p>
+          <p><strong>Bank:</strong> Standard Bank</p>
+          <p><strong>Account Number:</strong> 123456789</p>
+          <p><strong>Branch Code:</strong> 010203</p>
+          <p><strong>Reference:</strong>AAAS + Fullname</p>
+        </div>
+      </div>
+
+    </div>
+
+    <a href="#" class="help-link">Need help? Contact us : (111)-222-3333</a>
+  </div>
+</div>
+
 
     <script src="index.js"></script>
 </body>

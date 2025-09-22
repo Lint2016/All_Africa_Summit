@@ -1278,3 +1278,145 @@ img {
     right: 20px;
   }
 }
+/*Modal styles*/
+
+.close {
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  font-size: 2rem;
+  font-weight: bold;
+  color: #333;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.close:hover {
+  color: #e74c3c; /* red hover */
+}
+
+.bank-details {
+  display: none;
+  margin-top: 1rem;
+  text-align: left;
+  font-size: 0.95rem;
+  color: #333;
+  background: #f1f1f1;
+  padding: 1rem;
+  border-radius: 0.5rem;
+}
+.modal {
+  display: none; /* hidden by default */
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  position: relative;
+  background: #fff;
+  border-radius: 1rem;
+  padding: 2rem;
+  width: 90%;
+  max-width: 700px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  text-align: center;
+  animation: fadeIn 0.3s ease;
+}
+
+.modal-content h2 {
+  margin-bottom: 0.5rem;
+  font-size: 1.5rem;
+}
+
+.subtitle {
+  margin-bottom: 1.5rem;
+  color: #666;
+}
+
+/* Payment Options */
+.payment-options {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.payment-card {
+  background: #f9f9f9;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  flex: 1;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.payment-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+}
+
+.payment-card img {
+  max-width: 80px;
+  margin-bottom: 1rem;
+}
+
+.payment-card p {
+  margin-bottom: 1rem;
+  color: #444;
+}
+
+/* Buttons */
+.cta {
+  display: inline-block;
+  padding: 0.8rem 1.2rem;
+  border: none;
+  border-radius: 0.8rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.paypal-btn {
+  background: #0070ba;
+  color: white;
+}
+
+.paypal-btn:hover {
+  background: #005c99;
+}
+
+.bank-btn {
+  background: #444;
+  color: white;
+}
+
+.bank-btn:hover {
+  background: #222;
+}
+
+.help-link {
+  display: block;
+  margin-top: 1.5rem;
+  font-size: 0.9rem;
+  color: #0070ba;
+  text-decoration: none;
+}
+
+.help-link:hover {
+  text-decoration: underline;
+}
+
+/* Responsive */
+@media(min-width: 600px) {
+  .payment-options {
+    flex-direction: row;
+  }
+}
+
+@keyframes fadeIn {
+  from {opacity: 0; transform: scale(0.95);}
+  to {opacity: 1; transform: scale(1);}
+}
