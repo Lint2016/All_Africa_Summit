@@ -445,10 +445,8 @@
                     <h4>Contact Us</h4>
                     <p>Email: info@allafricaapostolic.org</p>
                     <p>Phone: +27 (111) 222-3333</p>
-                    <div class="social-links">
+                  <div class="social-links">
                         <a href="#" class="social-icon" aria-label="Facebook">f</a>
-                        <a href="#" class="social-icon" aria-label="YouTube">▶</a>
-                        <a href="#" class="social-icon" aria-label="Instagram">📷</a>
                     </div>
                 </div>
             </div>
@@ -466,11 +464,15 @@
  
 <div class="modal" id="paymentModal">
   <div class="modal-content">
-    <span class="close" id="closeModal">&times;</span>
+     <!-- Header stays fixed -->
+    <div class="modal-header">
+<span class="close" id="closeModal">&times;</span>
     <h2><span class="lock">🔒</span> Register for Event</h2>
     <p class="subtitle">Choose your payment method</p>
-
-    <div class="payment-options">
+    </div>
+    <!-- Body scrolls if needed -->
+      <div class="modal-body">
+        <div class="payment-options">
       
       <!-- PayPal Option -->
       <div class="payment-card paypal">
@@ -495,6 +497,8 @@
       </div>
 
     </div>
+      </div>
+   
 
     <a href="#" class="help-link">Need help? Contact us : (111)-222-3333</a>
   </div>
