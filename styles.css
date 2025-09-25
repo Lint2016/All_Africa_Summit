@@ -1278,8 +1278,43 @@ img {
     right: 20px;
   }
 }
-/*Modal styles*/
+/*Modal styles + registration form*/
 
+ #modalRegistrationForm {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 2rem;
+  }
+
+  #modalRegistrationForm label {
+    margin: 10px 0 5px;
+    font-weight: bold;
+    color: #333;
+  }
+
+  #modalRegistrationForm input,
+  #modalRegistrationForm select {
+    padding: 10px;
+    margin-bottom: 15px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 1rem;
+  }
+
+  #modalRegistrationForm button[type="submit"] {
+    background: #0077cc;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 12px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background 0.3s ease;
+  }
+
+  #modalRegistrationForm button[type="submit"]:hover {
+    background: #005fa3;
+  }
 .close {
   position: absolute;
   top: 15px;

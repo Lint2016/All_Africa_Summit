@@ -452,6 +452,7 @@
                     <h4>Contact Us</h4>
                     <p>Email: info@allafricaapostolic.org</p>
                     <p>Phone: +27 (111) 222-3333</p>
+                    <p>whatsapp: +27 (111) 222-3333</p>
                   <div class="social-links">
                         <a href="https://www.facebook.com/share/1BCjZvHbQs/" class="social-icon" aria-label="Facebook">f</a>
                     </div>
@@ -475,10 +476,50 @@
     <div class="modal-header">
 <span class="close" id="closeModal">&times;</span>
     <h2><span class="lock">🔒</span> Register for Event</h2>
-    <p class="subtitle">Choose your payment method</p>
+    <p class="subtitle">Choose your payment method, & submit the registration form afterward</p>
     </div>
     <!-- Body scrolls if needed -->
       <div class="modal-body">
+        <!-- Registration Form -->
+      <form id="modalRegistrationForm">
+        <label for="firstName">First Name</label>
+        <input type="text" id="firstName" name="firstName" required>
+
+        <label for="lastName">Last Name</label>
+        <input type="text" id="lastName" name="lastName" required>
+
+        <label for="email">Email Address</label>
+        <input type="email" id="email" name="email" required>
+
+        <label for="phone">Phone Number</label>
+        <input type="tel" id="phone" name="phone" required>
+
+        <label for="emergencyPhone">Emergency Phone Number</label>
+        <input type="tel" id="emergencyPhone" name="emergencyPhone" required>
+
+        <label for="country">Country of Origin</label>
+        <select id="country" name="country" required>
+          <option value="">-- Select Country --</option>
+          <option value="South Africa">South Africa</option>
+          <option value="USA">USA</option>
+          <option value="Nigeria">Nigeria</option>
+          <option value="Ghana">Ghana</option>
+          <option value="Zambia">Zambia</option>
+          <option value="Botswana">Botswana</option>
+          <option value="Namibia">Namibia</option>
+          <option value="Zimbabwe">Zimbabwe</option>
+          <option value="Other">Other</option>
+        </select>
+
+        <label for="dietary">Dietary Information</label>
+        <select id="dietary" name="dietary" required>
+          <option value="">-- Select --</option>
+          <option value="Vegetarian">Vegetarian</option>
+          <option value="Non Vegetarian">Non Vegetarian</option>
+        </select>
+
+        <button type="submit">Submit Registration</button>
+      </form>
         <div class="payment-options">
       
       <!-- PayPal Option -->
@@ -507,7 +548,7 @@
       </div>
    
 
-    <a href="#" class="help-link">Need help? Contact us : (111)-222-3333</a>
+    <a href="#" class="help-link">Need help? Contact us : (111)-222-3333 </br> whatsapp : 0861234256</a>
   </div>
 </div>
 
