@@ -1285,7 +1285,11 @@ img {
     flex-direction: column;
     margin-bottom: 2rem;
   }
-
+#submitBtn:disabled {
+    opacity: 0.5;           /* visually looks disabled */
+    cursor: not-allowed;    /* shows not-allowed cursor */
+    pointer-events: none;   /* prevents clicking */
+  }
   #modalRegistrationForm label {
     margin: 10px 0 5px;
     font-weight: bold;
