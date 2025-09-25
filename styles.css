@@ -1334,16 +1334,6 @@ img {
   color: #e74c3c; /* red hover */
 }
 
-.bank-details {
-  display: none;
-  margin-top: 1rem;
-  text-align: left;
-  font-size: 0.95rem;
-  color: #333;
-  background: #f1f1f1;
-  padding: 1rem;
-  border-radius: 0.5rem;
-}
 /* Make only the body scrollable */
 .modal-body {
   overflow-y: auto;

@@ -1,19 +1,21 @@
 // netlify/functions/create-order.js
-import fetch from "node-fetch";
-
 export async function handler(event) {
   if (event.httpMethod !== "POST") {
     return { statusCode: 405, body: "Method Not Allowed" };
   }
 
-  const { amount, currency = "USD" } = JSON.parse(event.body);
+  const { amount, currency = "USD" } = JSON.parse(event.body || "{}");
+
+  const PAYPAL_BASE = process.env.PAYPAL_ENV === "live"
+    ? "https://api-m.paypal.com"
+    : "https://api-m.sandbox.paypal.com";
 
   const auth = Buffer.from(
     `${process.env.PAYPAL_CLIENT_ID}:${process.env.PAYPAL_CLIENT_SECRET}`
   ).toString("base64");
 
   // 1. Get access token
-  const tokenRes = await fetch("https://api-m.sandbox.paypal.com/v1/oauth2/token", {
+  const tokenRes = await fetch(`${PAYPAL_BASE}/v1/oauth2/token`, {
     method: "POST",
     headers: {
       Authorization: `Basic ${auth}`,
@@ -24,7 +26,11 @@ export async function handler(event) {
   const { access_token } = await tokenRes.json();
 
   // 2. Create order
-  const orderRes = await fetch("https://api-m.sandbox.paypal.com/v2/checkout/orders", {
+  const siteUrl = process.env.URL || process.env.DEPLOY_PRIME_URL || "";
+  const returnUrl = siteUrl ? `${siteUrl}/index.html?paypal=return` : "https://example.com/return";
+  const cancelUrl = siteUrl ? `${siteUrl}/index.html?paypal=cancel` : "https://example.com/cancel";
+
+  const orderRes = await fetch(`${PAYPAL_BASE}/v2/checkout/orders`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${access_token}`,
@@ -36,8 +42,8 @@ export async function handler(event) {
         { amount: { currency_code: currency, value: amount } }
       ],
       application_context: {
-        return_url: "https://your-site-name.netlify.app/success.html",
-        cancel_url: "https://your-site-name.netlify.app/cancel.html",
+        return_url: returnUrl,
+        cancel_url: cancelUrl,
       }
     }),
   });
