@@ -67,7 +67,7 @@
     <!-- Modal1 -->
   <div id="landingModal" class="modal1">
     <img src="about-folder/about-picture3.jpg" alt="Landing">
-    <button onclick="closeModal()">Enter Site</button>
+    <button onclick="closeLandingModal()">Enter Site</button>
   </div>
 
     <!-- Navigation -->
@@ -513,7 +513,7 @@
 
  <script>
     //WELCOME MODAL OVERLAY
-    function closeModal() {
+    function closeLandingModal() {
       const modal = document.getElementById('landingModal');
       modal.classList.add('hidden');
       setTimeout(() => {

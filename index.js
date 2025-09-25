@@ -206,7 +206,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-//  MODAL SCRIPT  //
+//  MODAL SCRIPT  FOR PAYMENT//
 
  // Get elements
   const openModal = document.getElementById('registerBtn');
