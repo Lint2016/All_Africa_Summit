@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Register for the All Africa Apostolic Summit 2026">
+    <meta name="robots" content="index, follow">
+    <meta name="theme-color" content="#271f41">
+    <link rel="canonical" href="https://example.com/register.html" />
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="Register - All Africa Apostolic Summit 2026" />
+    <meta property="og:description" content="Register for the transformative experience of worship, preaching, teaching, healing, and prayer. February 25–27, 2026." />
+    <meta property="og:url" content="https://example.com/register.html" />
+    <meta property="og:image" content="images/worshippers.jpg" />
+
+    <link rel="shortcut icon" href="images/aaapic.jpg" type="image/x-icon">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <title>Register - All Africa Apostolic Summit 2026</title>
+    
+    <!-- Firebase compat SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="logo">
+                <img src="images/aaapic.jpg" alt="All Africa Apostolic Summit Logo" class="logo-img" loading="eager" decoding="sync" fetchpriority="high">
+            </div>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+            </ul>
+            <div class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Register Section -->
+    <section class="section" style="min-height: calc(100vh - 80px); padding-top: 120px;">
+        <div class="container">
+            <h1 class="section-title">Register for AAASummit</h1>
+            <p class="section-subtitle">Choose your payment method & submit the registration form</p>
+            
+            <!-- Registration Form -->
+            <div style="max-width: 800px; margin: 0 auto;">
+                <form id="registrationForm" style="background: white; padding: 2rem; border-radius: 1rem; box-shadow: 0 10px 30px rgba(0,0,0,0.1); margin-bottom: 2rem;">
+                    <!-- Honeypot field for Formspree spam protection -->
+                    <input type="text" name="_gotcha" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px;opacity:0;" aria-hidden="true">
+                    
+                    <label for="firstName">First Name</label>
+                    <input type="text" id="firstName" name="firstName" required>
+
+                    <label for="lastName">Last Name</label>
+                    <input type="text" id="lastName" name="lastName" required>
+
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" name="email" required>
+
+                    <label for="phone">Phone Number</label>
+                    <input type="tel" id="phone" name="phone" required>
+
+                    <label for="emergencyPhone">Emergency Phone Number</label>
+                    <input type="tel" id="emergencyPhone" name="emergencyPhone" required>
+
+                    <label for="country">Country of Origin</label>
+                    <select id="country" name="country" required>
+                      <option value="">-- Select Country --</option>
+                      <option value="South Africa">South Africa</option>
+                      <option value="USA">USA</option>
+                      <option value="Nigeria">Nigeria</option>
+                      <option value="Ethiopia">Ethiopia</option>
+                      <option value="Ghana">Ghana</option>
+                      <option value="Zambia">Zambia</option>
+                      <option value="Botswana">Botswana</option>
+                      <option value="Namibia">Namibia</option>
+                      <option value="Zimbabwe">Zimbabwe</option>
+                      <option value="Other">Other</option>
+                    </select>
+
+                    <label for="dietary">Dietary Information</label>
+                    <select id="dietary" name="dietary" required>
+                      <option value="">-- Select --</option>
+                      <option value="Vegetarian">Vegetarian</option>
+                      <option value="Non Vegetarian">Non Vegetarian</option>
+                    </select>
+
+                    <button type="submit" id="submitBtn" disabled>Submit Registration</button>
+                </form>
+
+                <div class="payment-options" style="background: white; padding: 2rem; border-radius: 1rem; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
+                    <h3 style="text-align: center; margin-bottom: 2rem; color: var(--color-primary);">Payment Options</h3>
+                    
+                    <!-- PayPal Option -->
+                    <div class="payment-card paypal">
+                        <img src="https://www.paypalobjects.com/webstatic/icon/pp258.png" alt="PayPal Logo">
+                        <p>Pay securely with PayPal</p>
+                        <button class="cta paypal-btn">Pay with PayPal</button>
+                    </div>
+
+                    <!-- PayFast Option -->
+                    <div class="payment-card payfast">
+                        <img src="images/payfast-logo.png" alt="PayFast Logo">
+                        <p>Pay securely with PayFast</p>
+                        <button class="cta payfast-btn">Pay with PayFast</button>
+                    </div>
+
+                    <!-- Bank Transfer Option -->
+                    <div class="payment-card bank-transfer">
+                        <img src="images/fnb_logo.png" alt="Bank Transfer Logo">
+                        <p>Direct bank transfer</p>
+                        <button class="cta bank-btn" id="showBankDetails">Show Bank Details</button>
+                        <div class="bank-details" id="bankDetails" style="display: none;">
+                            <p><strong>Account Name:</strong> Teleios Publishing Group Pty Ltd</p>
+                            <p><strong>Bank:</strong> Fnb</p>
+                            <p><strong>Account Number:</strong>62738987835</p>
+                            <p><strong>Branch Code:</strong>250655</p>
+                            <p><strong>Reference:</strong> AAAS + Your Full Name</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="text-align: center; margin-top: 2rem;">
+                <a href="#" class="help-link">Need help? Contact us: (111)-222-3333<br>WhatsApp: 0861234256</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <h3>All Africa Apostolic Summit</h3>
+                    <p>Bringing revival across nations through the power of the Gospel</p>
+                </div>
+                
+                <div class="footer-links">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-contact">
+                    <h4>Contact Us</h4>
+                    <p>Email: info@allafricaapostolic.org</p>
+                    <p>Phone: +27 (111) 222-3333</p>
+                    <p>WhatsApp: +27 (111) 222-3333</p>
+                    <div class="social-links">
+                        <a href="https://www.facebook.com/share/1BCjZvHbQs/" class="social-icon" aria-label="Facebook">f</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2025 All Africa Apostolic Summit. All Rights Reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Back to Top Button -->
+    <button id="backToTop" class="back-to-top" aria-label="Back to top">↑</button>
+
+    <script type='module' src="firebase-init.js"></script>
+    <script src="register.js"></script>
+</body>
+</html>
