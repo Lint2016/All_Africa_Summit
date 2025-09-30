@@ -1,7 +1,4 @@
- // Initialize Firebase (ES6 modules)
-import { initializeApp } from "firebase/app";
-import { getFirestore } from "firebase/firestore";
-
+// Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyAl5oR3RvlgP8b9WvdxZaPvkc0rMb_R94M",
   authDomain: "aaasummit-d063e.firebaseapp.com",
@@ -13,12 +10,12 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
+let db;
 try {
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
-  
-  // Make available globally for register.js
-  window.firebaseApp = app;
+  // Initialize Firebase
+  const app = firebase.initializeApp(firebaseConfig);
+  db = firebase.firestore();
+  window.firebase = firebase;
   window.db = db;
   
   console.log("Firebase initialized successfully");
