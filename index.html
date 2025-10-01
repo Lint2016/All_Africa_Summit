@@ -378,116 +378,30 @@
     <section id="sermons" class="section bg-light">
         <div class="container">
             <h2 class="section-title">Listen to Sermons</h2>
-            <p class="section-subtitle">Catch up on messages from the crusade</p>
-            
-            <div class="sermon-tabs">
-                <div class="tab-header">
-                    <div class="tab-btn active" data-tab="sermon-day1">Day 1</div>
-                    <div class="tab-btn" data-tab="sermon-day2">Day 2</div>
-                    <div class="tab-btn" data-tab="sermon-day3">Day 3</div>
-                </div>
-                
-                <div id="sermon-day1" class="tab-content active">
-                    <div class="sermon-card">
-                        <h3>Awakening the Nations</h3>
-                        <p class="speaker">Apostle Brandon</p>
-                        <div class="audio-player">
-                            <audio id="audio1" src="sermons/Vocaroo 18 Sep 2025 04_47_03 EDT 1kUEIjRg4iSW.mp3"></audio>
-                            <div class="audio-controls">
-                                <button class="play-btn" data-audio="audio1">
-                                    <span class="play-icon">▶</span>
-                                    <span class="pause-icon">❚❚</span>
-                                </button>
-                                <div class="progress-container">
-                                    <div class="progress-bar"></div>
-                                </div>
-                                <div class="time">00:00 / 00:00</div>
-                                <a class="btn btn-secondary download-btn" href="sermons/Vocaroo 18 Sep 2025 04_47_03 EDT 1kUEIjRg4iSW.mp3" download>Download</a>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="sermon-card">
-                        <h3>Faith that Moves Mountains</h3>
-                        <p class="speaker">Pastor Grace</p>
-                        <div class="audio-player">
-                            <audio id="audio2" src="sermons/Vocaroo 18 Sep 2025 04_50_37 EDT 11EtoE3sC8Wi.mp3"></audio>
-                            <div class="audio-controls">
-                                <button class="play-btn" data-audio="audio2">
-                                    <span class="play-icon">▶</span>
-                                    <span class="pause-icon">❚❚</span>
-                                </button>
-                                <div class="progress-container">
-                                    <div class="progress-bar"></div>
-                                </div>
-                                <div class="time">00:00 / 00:00</div>
-                                <a class="btn btn-secondary download-btn" href="sermons/Vocaroo 18 Sep 2025 04_50_37 EDT 11EtoE3sC8Wi.mp3" download>Download</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div id="sermon-day2" class="tab-content">
-                    <div class="sermon-card">
-                        <h3>Healing the Broken</h3>
-                        <p class="speaker">Apostle Brandon</p>
-                        <div class="audio-player">
-                            <audio id="audio3" src="sermons/day2-healing.mp3"></audio>
-                            <div class="audio-controls">
-                                <button class="play-btn" data-audio="audio3">
-                                    <span class="play-icon">▶</span>
-                                    <span class="pause-icon">❚❚</span>
-                                </button>
-                                <div class="progress-container">
-                                    <div class="progress-bar"></div>
-                                </div>
-                                <div class="time">00:00 / 00:00</div>
-                                <a class="btn btn-secondary download-btn" href="sermons/day2-healing.mp3" download>Download</a>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="sermon-card">
-                        <h3>Deliverance Service</h3>
-                        <p class="speaker">Pastor Grace</p>
-                        <div class="audio-player">
-                            <audio id="audio4" src="sermons/day2-deliverance.mp3"></audio>
-                            <div class="audio-controls">
-                                <button class="play-btn" data-audio="audio4">
-                                    <span class="play-icon">▶</span>
-                                    <span class="pause-icon">❚❚</span>
-                                </button>
-                                <div class="progress-container">
-                                    <div class="progress-bar"></div>
-                                </div>
-                                <div class="time">00:00 / 00:00</div>
-                                <a class="btn btn-secondary download-btn" href="sermons/day2-deliverance.mp3" download>Download</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div id="sermon-day3" class="tab-content">
-                    <div class="sermon-card">
-                        <h3>Revival Fire Night</h3>
-                        <p class="speaker">All Ministers</p>
-                        <div class="audio-player">
-                            <audio id="audio5" src="sermons/day3-revival.mp3"></audio>
-                            <div class="audio-controls">
-                                <button class="play-btn" data-audio="audio5">
-                                    <span class="play-icon">▶</span>
-                                    <span class="pause-icon">❚❚</span>
-                                </button>
-                                <div class="progress-container">
-                                    <div class="progress-bar"></div>
-                                </div>
-                                <div class="time">00:00 / 00:00</div>
-                                <a class="btn btn-secondary download-btn" href="sermons/day3-revival.mp3" download>Download</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <p class="section-subtitle">Catch up on messages from the Summit</p>
+          <div class="form-card">
+    <h2 class="form-title">Access the Sermons</h2>
+    <p class="form-subtitle">
+      Enter your registered email to watch, listen, or download the sermons.
+    </p>
+
+    <form action="sermon.html" method="GET" class="sermon-form">
+      <div class="input-group">
+        <label for="email">Registered Email</label>
+        <input 
+          type="email" 
+          id="email" 
+          name="email" 
+          placeholder="Please enter your registered email" 
+          required
+        />
+      </div>
+
+      <button type="submit" class="btn-submit">Access Sermons</button>
+    </form>
+
+  </div>  
+          
         </div>
     </section>
 

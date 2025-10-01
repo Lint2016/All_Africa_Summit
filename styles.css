@@ -1469,12 +1469,89 @@ img {
   text-decoration: underline;
 }
 
-/* Responsive */
-@media(min-width: 600px) {
-  .payment-options {
-    flex-direction: row;
-  }
+/* Sermon Access Form */
+.form-card {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border-radius: var(--border-radius);
+  padding: 1.75rem 2rem;
+  max-width: 600px;
+  margin: 1.5rem auto;
+  box-shadow: var(--box-shadow);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
+
+.form-title {
+  color: var(--color-accent);
+  text-align: center;
+  font-family: 'Playfair Display', serif;
+  font-size: 2rem;
+}
+
+.form-subtitle {
+   color: var(--color-accent); /* make text visible */
+  text-align: center;
+  margin-bottom: 1.5rem;       /* spacing before the input */
+  font-size: 1rem;
+  line-height: 1.5;
+  opacity: 0.85;               /* softer contrast */
+  font-family: 'Poppins', sans-serif;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.input-group label {
+  color: var(--color-accent);
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+
+.input-group input {
+  padding: 0.8rem 1rem;
+  border: 2px solid var(--color-accent);
+  border-radius: var(--border-radius);
+  background: rgba(95, 75, 75, 0.5);
+  color: var(--color-light);
+  font-family: 'Poppins', sans-serif;
+  transition: var(--transition);
+}
+
+.input-group input:focus {
+  outline: none;
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 2px rgba(222, 204, 162, 0.3);
+}
+
+.input-group input::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.btn-submit {
+  background: var(--color-secondary);
+  color: white;
+  border: none;
+  padding: 1rem 2rem;
+  border-radius: var(--border-radius);
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: var(--transition);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 1rem;
+}
+
+.btn-submit:hover {
+  background: #9c4a30;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(178, 85, 56, 0.3);
+}
+
 
 @keyframes fadeIn {
   from {opacity: 0; transform: scale(0.95);}

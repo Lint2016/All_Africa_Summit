@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Africa Apostolic Summit - Sermons</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="shortcut icon" href="images/aaapic.jpg" type="image/x-icon">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="logo">
+                <a href="index.html">
+                    <img src="images/aaapic.jpg" alt="All Africa Apostolic Summit Logo" class="logo-img">
+                </a>
+            </div>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+            </ul>
+            <div class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Sermons Section -->
+    <section class="section">
+        <div class="container">
+            <h1 class="section-title">Sermon Recordings</h1>
+            <p class="section-subtitle">Listen to messages from the All Africa Apostolic Summit</p>
+            
+            <div class="sermon-tabs">
+                <div class="tab-header">
+                    <div class="tab-btn active" data-tab="sermon-day1">Day 1</div>
+                    <div class="tab-btn" data-tab="sermon-day2">Day 2</div>
+                    <div class="tab-btn" data-tab="sermon-day3">Day 3</div>
+                </div>
+                
+                <div id="sermon-day1" class="tab-content active">
+                    <div class="sermon-card">
+                        <h3>Awakening the Nations</h3>
+                        <p class="speaker">Apostle Brandon</p>
+                        <div class="audio-player">
+                            <audio id="audio1" src="sermons/Vocaroo 18 Sep 2025 04_47_03 EDT 1kUEIjRg4iSW.mp3"></audio>
+                            <div class="audio-controls">
+                                <button class="play-btn" data-audio="audio1">
+                                    <span class="play-icon">▶</span>
+                                    <span class="pause-icon">❚❚</span>
+                                </button>
+                                <div class="progress-container">
+                                    <div class="progress-bar"></div>
+                                </div>
+                                <div class="time">00:00 / 00:00</div>
+                                <a class="btn btn-secondary download-btn" href="sermons/Vocaroo 18 Sep 2025 04_47_03 EDT 1kUEIjRg4iSW.mp3" download>Download</a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="sermon-card">
+                        <h3>Faith that Moves Mountains</h3>
+                        <p class="speaker">Pastor Grace</p>
+                        <div class="audio-player">
+                            <audio id="audio2" src="sermons/Vocaroo 18 Sep 2025 04_50_37 EDT 11EtoE3sC8Wi.mp3"></audio>
+                            <div class="audio-controls">
+                                <button class="play-btn" data-audio="audio2">
+                                    <span class="play-icon">▶</span>
+                                    <span class="pause-icon">❚❚</span>
+                                </button>
+                                <div class="progress-container">
+                                    <div class="progress-bar"></div>
+                                </div>
+                                <div class="time">00:00 / 00:00</div>
+                                <a class="btn btn-secondary download-btn" href="sermons/Vocaroo 18 Sep 2025 04_50_37 EDT 11EtoE3sC8Wi.mp3" download>Download</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="sermon-day2" class="tab-content">
+                    <div class="sermon-card">
+                        <h3>Healing the Broken</h3>
+                        <p class="speaker">Apostle Brandon</p>
+                        <div class="audio-player">
+                            <audio id="audio3" src="sermons/day2-healing.mp3"></audio>
+                            <div class="audio-controls">
+                                <button class="play-btn" data-audio="audio3">
+                                    <span class="play-icon">▶</span>
+                                    <span class="pause-icon">❚❚</span>
+                                </button>
+                                <div class="progress-container">
+                                    <div class="progress-bar"></div>
+                                </div>
+                                <div class="time">00:00 / 00:00</div>
+                                <a class="btn btn-secondary download-btn" href="sermons/day2-healing.mp3" download>Download</a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="sermon-card">
+                        <h3>Deliverance Service</h3>
+                        <p class="speaker">Pastor Grace</p>
+                        <div class="audio-player">
+                            <audio id="audio4" src="sermons/day2-deliverance.mp3"></audio>
+                            <div class="audio-controls">
+                                <button class="play-btn" data-audio="audio4">
+                                    <span class="play-icon">▶</span>
+                                    <span class="pause-icon">❚❚</span>
+                                </button>
+                                <div class="progress-container">
+                                    <div class="progress-bar"></div>
+                                </div>
+                                <div class="time">00:00 / 00:00</div>
+                                <a class="btn btn-secondary download-btn" href="sermons/day2-deliverance.mp3" download>Download</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="sermon-day3" class="tab-content">
+                    <div class="sermon-card">
+                        <h3>Revival Fire Night</h3>
+                        <p class="speaker">All Ministers</p>
+                        <div class="audio-player">
+                            <audio id="audio5" src="sermons/day3-revival.mp3"></audio>
+                            <div class="audio-controls">
+                                <button class="play-btn" data-audio="audio5">
+                                    <span class="play-icon">▶</span>
+                                    <span class="pause-icon">❚❚</span>
+                                </button>
+                                <div class="progress-container">
+                                    <div class="progress-bar"></div>
+                                </div>
+                                <div class="time">00:00 / 00:00</div>
+                                <a class="btn btn-secondary download-btn" href="sermons/day3-revival.mp3" download>Download</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <h3>All Africa Apostolic Summit</h3>
+                    <p>Bringing revival across nations through the power of the Gospel</p>
+                </div>
+                <div class="footer-links">
+                    <h4>Quick Link</h4>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                    </ul>
+                </div>
+                <div class="footer-contact">
+                    <h4>Contact Us</h4>
+                    <p>Email: info@allafricaapostolic.org</p>
+                    <p>Phone: +27 (111) 222-3333</p>
+                    <p>whatsapp: +27 (111) 222-3333</p>
+                  <div class="social-links">
+                        <a href="https://www.facebook.com/share/1BCjZvHbQs/" class="social-icon" aria-label="Facebook">f</a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 All Africa Apostolic Summit. All Rights Reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="firebase-init.js"></script>
+    <script>
+        // Check if user is authenticated
+        firebase.auth().onAuthStateChanged(function(user) {
+            if (!user) {
+                // User is not authenticated, redirect to home page
+                window.location.href = 'index.html';
+            }
+        });
+
+        // Tab functionality
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                // Remove active class from all buttons and content
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                
+                // Add active class to clicked button
+                btn.classList.add('active');
+                
+                // Show corresponding content
+                const tabId = btn.getAttribute('data-tab');
+                document.getElementById(tabId).classList.add('active');
+            });
+        });
+
+        // Audio player functionality
+        document.querySelectorAll('.play-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const audioId = this.getAttribute('data-audio');
+                const audio = document.getElementById(audioId);
+                const playIcon = this.querySelector('.play-icon');
+                const pauseIcon = this.querySelector('.pause-icon');
+                
+                if (audio.paused) {
+                    audio.play();
+                    playIcon.style.display = 'none';
+                    pauseIcon.style.display = 'inline';
+                } else {
+                    audio.pause();
+                    playIcon.style.display = 'inline';
+                    pauseIcon.style.display = 'none';
+                }
+                
+                // Update progress bar
+                audio.addEventListener('timeupdate', function() {
+                    const progress = (audio.currentTime / audio.duration) * 100;
+                    const progressBar = this.parentElement.querySelector('.progress-bar');
+                    progressBar.style.width = progress + '%';
+                    
+                    // Update time display
+                    const timeDisplay = this.parentElement.querySelector('.time');
+                    const currentMins = Math.floor(audio.currentTime / 60);
+                    const currentSecs = Math.floor(audio.currentTime % 60);
+                    const durationMins = Math.floor(audio.duration / 60);
+                    const durationSecs = Math.floor(audio.duration % 60);
+                    
+                    timeDisplay.textContent = 
+                        `${currentMins}:${currentSecs < 10 ? '0' : ''}${currentSecs} / ${durationMins}:${durationSecs < 10 ? '0' : ''}${durationSecs}`;
+                });
+                
+                // Reset play button when audio ends
+                audio.addEventListener('ended', function() {
+                    playIcon.style.display = 'inline';
+                    pauseIcon.style.display = 'none';
+                });
+            });
+        });
+    </script>
+</body>
+</html>
