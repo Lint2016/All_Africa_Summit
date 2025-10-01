@@ -209,7 +209,8 @@
             
             // Handle bank transfer confirmation
             confirmBankTransfer.addEventListener('click', function() {
-                const eftReference = document.getElementById('eftReference').value.trim();
+                const eftReferenceInput = document.querySelector('input[name="eftReference"]:not([type="hidden"])');
+                const eftReference = eftReferenceInput ? eftReferenceInput.value.trim() : '';
                 if (!eftReference) {
                     Swal.fire({
                         title: 'Reference Required',
@@ -249,20 +250,19 @@
                     formObject[key] = value;
                 });
                 
-                // Get the EFT reference from the hidden input (already included in formData)
+                // Get the EFT reference from the hidden input
+                const eftReferenceInput = document.getElementById('eftReferenceInput');
+                const eftReference = eftReferenceInput ? eftReferenceInput.value : 'Not provided';
                 
                 // Here you would typically send the data to your server
-                console.log('Form submitted:', formObject);
-                
-                // Get the EFT reference from the form data
-                const eftReference = formData.get('eftReference') || 'Not provided';
+                console.log('Form submitted:', formObject, 'EFT Reference:', eftReference);
                 
                 // Show success message with EFT reference
                 Swal.fire({
                     title: '✅ Registration Submitted!',
-                    html: `Thank you for registering!<br><br>` +
-                          `Your EFT reference: <strong>${eftReference}</strong><br><br>` +
-                          `Your payment is pending verification (24–48 hrs). You'll receive a confirmation email once processed.`,
+                    html: `Thank you for registering!<br><br>
+                          Your EFT reference: <strong>${eftReference}</strong><br><br>
+                          Your payment is pending verification (24–48 hrs). You'll receive a confirmation email once processed.`,
                     icon: 'success',
                     confirmButtonText: 'Got it!',
                     confirmButtonColor: '#b25538',
