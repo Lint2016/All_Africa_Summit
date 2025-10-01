@@ -1617,3 +1617,268 @@ img {
     object-fit: cover; /* crop instead of stretching */
   }
 }
+
+/* Payment Options */
+#accountNumber{
+  padding-left: 1rem;
+}
+.payment-options {
+  background: white;
+  padding: 2rem;
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+  max-width: 800px;
+  margin: 0 auto;
+}
+.payment-options-title {
+  text-align: center;
+  margin-bottom: 2rem;
+  color: var(--color-primary);
+  font-size: 1.5rem;
+}
+
+.payment-card {
+  background: #f9f9f9;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  border: 1px solid #eee;
+  transition: all 0.3s ease;
+}
+
+.payment-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.payment-card img {
+  max-width: 100px;
+  height: auto;
+  margin-bottom: 1rem;
+  display: block;
+}
+
+.payment-card p {
+  margin: 1rem 0;
+  color: #555;
+}
+
+/* Bank Details Panel */
+.bank-details-panel {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #eee;
+}
+
+.bank-note {
+  background-color: #fff8e6;
+  color: #856404;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  margin-bottom: 1.5rem;
+  font-size: 0.9rem;
+  border-left: 4px solid #ffc107;
+}
+
+.bank-info {
+  background: #f8f9fa;
+  border-radius: 0.5rem;
+  padding: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.bank-detail-row {
+  display: flex;
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid #eee;
+}
+
+.bank-detail-row:last-child {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.bank-label {
+  font-weight: 600;
+  color: #333;
+  min-width: 140px;
+  flex-shrink: 0;
+}
+
+.bank-value {
+  color: #555;
+  flex-grow: 1;
+}
+
+.bank-value-with-copy {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.copy-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.1rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  transition: all 0.2s;
+  color: #666;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.copy-btn:hover {
+  background: #f0f0f0;
+  color: #333;
+}
+
+.copy-btn:active {
+  transform: scale(0.95);
+}
+
+/* Bank Transfer Specific Styles */
+.bank-transfer .bank-btn {
+  background: var(--color-secondary);
+  color: white;
+  width: 100%;
+  margin-top: 1rem;
+  border: none;
+  padding: 0.8rem 1.5rem;
+  border-radius: var(--border-radius);
+  font-family: 'Poppins', sans-serif;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.bank-transfer .bank-btn:hover {
+  background: #9c4a30;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.bank-confirm-btn {
+  background: #28a745 !important;
+  color: white !important;
+  width: 100%;
+  padding: 0.8rem !important;
+  font-size: 1rem !important;
+  border: none !important;
+  border-radius: 0.5rem !important;
+  cursor: pointer;
+  transition: all 0.3s;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 500;
+}
+
+.bank-confirm-btn:hover {
+  background: #218838 !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+/* Input Group for EFT Reference */
+#eftReferenceGroup {
+  margin-top: 1.5rem;
+}
+
+#eftReferenceGroup label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: #333;
+}
+
+#eftReferenceGroup input[type="text"] {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid #ddd;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  transition: border-color 0.3s;
+}
+
+#eftReferenceGroup input[type="text"]:focus {
+  outline: none;
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 2px rgba(222, 204, 162, 0.3);
+}
+
+.hint {
+  display: block;
+  margin-top: 0.5rem;
+  font-size: 0.8rem;
+  color: #666;
+  font-style: italic;
+}
+
+/* Payment Method Selection */
+.payment-card.selected {
+  border: 2px solid var(--color-accent);
+  background-color: rgba(222, 204, 162, 0.1);
+}
+
+.payment-card .select-payment {
+  width: 100%;
+  margin-top: 1rem;
+  padding: 0.8rem 1.5rem;
+  border: none;
+  border-radius: var(--border-radius);
+  font-family: 'Poppins', sans-serif;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 1rem;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .bank-detail-row {
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  
+  .bank-label {
+    min-width: auto;
+    margin-bottom: 0.25rem;
+  }
+  
+  .payment-options {
+    padding: 1rem;
+  }
+  
+  .payment-card {
+    padding: 1rem;
+  }
+  
+  .bank-info {
+    padding: 1rem;
+  }
+}
+
+/* SweetAlert Customization */
+.swal2-popup {
+  font-family: 'Poppins', sans-serif;
+  border-radius: 0.75rem;
+}
+
+.swal2-title {
+  font-family: 'Playfair Display', serif;
+  font-weight: 700;
+}
+
+.swal2-confirm {
+  background-color: var(--color-secondary) !important;
+}
+
+.swal2-confirm:focus {
+  box-shadow: 0 0 0 3px rgba(178, 85, 56, 0.3) !important;
+}

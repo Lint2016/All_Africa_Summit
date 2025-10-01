@@ -49,19 +49,20 @@
     <section class="section" style="min-height: calc(100vh - 80px); padding-top: 120px;">
         <div class="container">
             <h1 class="section-title">Register for AAASummit</h1>
-            <p class="section-subtitle">Choose your payment method & submit the registration form</p>
             
             <!-- Registration Form -->
             <div style="max-width: 800px; margin: 0 auto;">
                 <form id="registrationForm" style="background: white; padding: 2rem; border-radius: 1rem; box-shadow: 0 10px 30px rgba(0,0,0,0.1); margin-bottom: 2rem;">
                     <!-- Honeypot field for Formspree spam protection -->
-                    <input type="text" name="_gotcha" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px;opacity:0;" aria-hidden="true">
-                    
-                    <label for="firstName">First Name</label>
-                    <input type="text" id="firstName" name="firstName" required>
+                <input type="text" name="_gotcha" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px;opacity:0;" aria-hidden="true">
+                   
+                    <input type="hidden" name="eftReference" id="eftReference">
+                   
+                    <label for="email">First Name</label>
+                    <input type="email" id="firstName" name="firstName" required>
 
-                    <label for="lastName">Last Name</label>
-                    <input type="text" id="lastName" name="lastName" required>
+                    <label for="email">Last Name</label>
+                    <input type="email" id="lastName" name="lastName" required>
 
                     <label for="email">Email Address</label>
                     <input type="email" id="email" name="email" required>
@@ -94,37 +95,75 @@
                       <option value="Non Vegetarian">Non Vegetarian</option>
                     </select>
 
+                    <input type="hidden" name="eftReference" id="eftReference">
                     <button type="submit" id="submitBtn" disabled>Submit Registration</button>
                 </form>
 
-                <div class="payment-options" style="background: white; padding: 2rem; border-radius: 1rem; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
-                    <h3 style="text-align: center; margin-bottom: 2rem; color: var(--color-primary);">Payment Options</h3>
+                <div class="payment-options">
+                    <h3 class="payment-options-title">Payment Options</h3>
                     
                     <!-- PayPal Option -->
-                    <div class="payment-card paypal">
+                    <div class="payment-card paypal" data-payment-method="paypal">
                         <img src="https://www.paypalobjects.com/webstatic/icon/pp258.png" alt="PayPal Logo">
                         <p>Pay securely with PayPal</p>
-                        <button class="cta paypal-btn">Pay with PayPal</button>
+                        <button type="button" class="cta paypal-btn select-payment">Pay with PayPal</button>
                     </div>
 
                     <!-- PayFast Option -->
-                    <div class="payment-card payfast">
+                    <div class="payment-card payfast" data-payment-method="payfast">
                         <img src="images/payfast-logo.png" alt="PayFast Logo">
                         <p>Pay securely with PayFast</p>
-                        <button class="cta payfast-btn">Pay with PayFast</button>
+                        <button type="button" class="cta payfast-btn select-payment">Pay with PayFast</button>
                     </div>
 
                     <!-- Bank Transfer Option -->
-                    <div class="payment-card bank-transfer">
+                    <div class="payment-card bank-transfer" data-payment-method="bank">
                         <img src="images/fnb_logo.png" alt="Bank Transfer Logo">
                         <p>Direct bank transfer</p>
-                        <button class="cta bank-btn" id="showBankDetails">Show Bank Details</button>
-                        <div class="bank-details" id="bankDetails" style="display: none;">
-                            <p><strong>Account Name:</strong> Teleios Publishing Group Pty Ltd</p>
-                            <p><strong>Bank:</strong> Fnb</p>
-                            <p><strong>Account Number:</strong>62738987835</p>
-                            <p><strong>Branch Code:</strong>250655</p>
-                            <p><strong>Reference:</strong> AAAS + Your Full Name</p>
+                        <button type="button" class="cta bank-btn select-payment" id="selectBankTransfer">Select Bank Transfer</button>
+                        
+                        <!-- Bank Details Panel -->
+                        <div class="bank-details-panel" id="bankDetailsPanel" style="display: none;">
+                            <p class="bank-note">Direct Deposit may take 24–48 hours for verification, only then you will receive your welcome email.</p>
+                            
+                            <div class="bank-info">
+                                <div class="bank-detail-row">
+                                    <span class="bank-label">Account Name:</span>
+                                    <span class="bank-value">Teleios Publishing Group Pty Ltd</span>
+                                </div>
+                                <div class="bank-detail-row">
+                                    <span class="bank-label">Bank:</span>
+                                    <span class="bank-value">FNB</span>
+                                </div>
+                                <div class="bank-detail-row">
+                                    <span class="bank-label">Account Number:</span>
+                                    <div class="bank-value-with-copy">
+                                        <span id="accountNumber" class="bank-value"> 62738987835</span>
+                                        <button type="button" class="copy-btn" data-clipboard-target="#accountNumber" title="Copy to clipboard">
+                                            📋
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="bank-detail-row">
+                                    <span class="bank-label">Branch Code:</span>
+                                    <span class="bank-value">250655</span>
+                                </div>
+                                <div class="bank-detail-row">
+                                    <span class="bank-label">Reference:</span>
+                                    <span class="bank-value">AAAS + Your Full Name</span>
+                                </div>
+                            </div>
+                            
+                            <!-- EFT Reference Number Input -->
+                            <div class="input-group" id="eftReferenceGroup" style="display: none;">
+                                <label for="eftReference">EFT Reference Number *</label>
+                                <input type="text" id="eftReference" name="eftReference" placeholder="Enter your EFT reference number" required>
+                                <small class="hint">Enter the reference number from your bank transfer, click I've made the transfer button below, scroll up & fill the registration form above then submit your details</small>
+                            </div>
+                            
+                            <button type="button" class="cta bank-confirm-btn" id="confirmBankTransfer" style="display: none; margin-top: 1rem;">
+                                I've Made the Transfer
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -136,6 +175,129 @@
         </div>
     </section>
 
+    <!-- Add Clipboard.js library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.8/clipboard.min.js"></script>
+    
+    <!-- Add SweetAlert2 CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize clipboard.js
+            new ClipboardJS('.copy-btn');
+            
+            // Payment method selection
+            const paymentCards = document.querySelectorAll('.payment-card');
+            const selectBankTransfer = document.getElementById('selectBankTransfer');
+            const bankDetailsPanel = document.getElementById('bankDetailsPanel');
+            const eftReferenceGroup = document.getElementById('eftReferenceGroup');
+            const confirmBankTransfer = document.getElementById('confirmBankTransfer');
+            const submitBtn = document.getElementById('submitBtn');
+            const registrationForm = document.getElementById('registrationForm');
+            
+            // Handle bank transfer selection
+            selectBankTransfer.addEventListener('click', function(e) {
+                e.preventDefault();
+                bankDetailsPanel.style.display = 'block';
+                this.style.display = 'none';
+                // Show the EFT reference input after a short delay
+                setTimeout(() => {
+                    eftReferenceGroup.style.display = 'block';
+                    confirmBankTransfer.style.display = 'block';
+                }, 300);
+            });
+            
+            // Handle bank transfer confirmation
+            confirmBankTransfer.addEventListener('click', function() {
+                const eftReference = document.getElementById('eftReference').value.trim();
+                if (!eftReference) {
+                    Swal.fire({
+                        title: 'Reference Required',
+                        text: 'Please enter your EFT reference number.',
+                        icon: 'warning',
+                        confirmButtonText: 'OK'
+                    });
+                    return;
+                }
+                
+                // Enable submit button, store the reference, and update the hidden input
+                submitBtn.disabled = false;
+                submitBtn.setAttribute('data-eft-reference', eftReference);
+                document.getElementById('eftReferenceInput').value = eftReference;
+                
+                // Show confirmation message
+                Swal.fire({
+                    title: 'Ready to Submit',
+                    html: `Your EFT reference <strong>${eftReference}</strong> has been recorded.<br><br>Please review your information and click the Submit Registration button below.`,
+                    icon: 'info',
+                    confirmButtonText: 'Got it!',
+                    confirmButtonColor: '#b25538'
+                });
+                
+                // Scroll to submit button
+                submitBtn.scrollIntoView({ behavior: 'smooth' });
+            });
+            
+            // Handle form submission
+            registrationForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Get form data
+                const formData = new FormData(registrationForm);
+                const formObject = {};
+                formData.forEach((value, key) => {
+                    formObject[key] = value;
+                });
+                
+                // Get the EFT reference from the hidden input (already included in formData)
+                
+                // Here you would typically send the data to your server
+                console.log('Form submitted:', formObject);
+                
+                // Get the EFT reference from the form data
+                const eftReference = formData.get('eftReference') || 'Not provided';
+                
+                // Show success message with EFT reference
+                Swal.fire({
+                    title: '✅ Registration Submitted!',
+                    html: `Thank you for registering!<br><br>` +
+                          `Your EFT reference: <strong>${eftReference}</strong><br><br>` +
+                          `Your payment is pending verification (24–48 hrs). You'll receive a confirmation email once processed.`,
+                    icon: 'success',
+                    confirmButtonText: 'Got it!',
+                    confirmButtonColor: '#b25538',
+                    customClass: {
+                        popup: 'sweet-alert-popup',
+                        confirmButton: 'sweet-alert-confirm'
+                    }
+                }).then(() => {
+                    // Redirect to thank you page or home page
+                    // window.location.href = 'thank-you.html';
+                });
+                
+                // Reset form
+                registrationForm.reset();
+                submitBtn.disabled = true;
+                submitBtn.removeAttribute('data-eft-reference');
+            });
+            
+            // Handle copy button feedback
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const originalText = this.innerHTML;
+                    this.innerHTML = '✓ Copied!';
+                    this.style.color = '#28a745';
+                    
+                    setTimeout(() => {
+                        this.innerHTML = originalText;
+                        this.style.color = '';
+                    }, 2000);
+                });
+            });
+        });
+    </script>
+    
     <!-- Footer -->
     <footer class="footer">
         <div class="container">
