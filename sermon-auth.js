@@ -1,3 +1,30 @@
+// Wait for Firebase to be available
+async function waitForFirebase() {
+  return new Promise((resolve) => {
+    const checkFirebase = () => {
+      if (window.firebase && window.firebase.app) {
+        resolve();
+      } else {
+        setTimeout(checkFirebase, 100);
+      }
+    };
+    checkFirebase();
+  });
+}
+
+// Import necessary Firebase functions
+import { 
+  collection, 
+  query, 
+  where, 
+  getDocs 
+} from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js';
+
+import { 
+  onAuthStateChanged, 
+  signInAnonymously 
+} from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js';
+
 // Helper function to validate email format
 function isValidEmail(email) {
     const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -40,7 +67,16 @@ function resetButton(button, originalText) {
     button.innerHTML = originalText;
 }
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', async function() {
+    // Wait for Firebase to be ready
+    await waitForFirebase();
+    
+    const { db, auth } = window.firebase;
+    
+    if (!db || !auth) {
+        console.error('Firebase not properly initialized');
+        return;
+    }
     const sermonAuthForm = document.getElementById('sermonAuthForm');
     const emailInput = document.getElementById('email');
     
@@ -70,18 +106,23 @@ document.addEventListener('DOMContentLoaded', function() {
 
             try {
                 // Check if email exists in Firestore
-                const db = firebase.firestore();
-                const usersRef = db.collection('registrations');
-                const snapshot = await usersRef.where('email', '==', email).get();
+                const usersRef = collection(db, 'registrations');
+                const q = query(usersRef, where('email', '==', email));
+                const querySnapshot = await getDocs(q);
                 
-                if (snapshot.empty) {
+                if (querySnapshot.empty) {
                     showMessage('Email not found. Please register first.', 'error');
                     resetButton(submitBtn, originalBtnText);
                     return;
                 }
 
                 // Email exists, sign in anonymously to access protected content
-                await firebase.auth().signInAnonymously();
+                try {
+                    await signInAnonymously(auth);
+                } catch (error) {
+                    console.error('Anonymous sign-in error:', error);
+                    throw error; // Re-throw to be caught by the outer try-catch
+                }
                 
                 // Store email in session storage for verification
                 sessionStorage.setItem('authenticatedEmail', email);
@@ -97,9 +138,9 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Check if user is already authenticated on sermon page
+// Check if user is already authenticated on sermon page
     if (window.location.pathname.includes('sermon.html')) {
-        firebase.auth().onAuthStateChanged(function(user) {
+        onAuthStateChanged(auth, (user) => {
             if (!user || !sessionStorage.getItem('authenticatedEmail')) {
                 // User is not authenticated, redirect to home page
                 window.location.href = 'index.html';
