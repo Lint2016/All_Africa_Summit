@@ -10,7 +10,10 @@ import {
 } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js';
 import { 
   getAuth,
-  onAuthStateChanged 
+  onAuthStateChanged,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  signOut
 } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js';
 
 // Firebase config
@@ -47,6 +50,13 @@ export async function initializeFirebase() {
     // Initialize services
     db = getFirestore(app);
     auth = getAuth(app);
+    
+    // Make auth methods available globally
+    window.firebase = window.firebase || {};
+    window.firebase.auth = auth;
+    window.firebase.signInWithEmailAndPassword = signInWithEmailAndPassword;
+    window.firebase.createUserWithEmailAndPassword = createUserWithEmailAndPassword;
+    window.firebase.signOut = signOut;
 
     // Make available globally for debugging
     window.firebase = { app, db, auth };

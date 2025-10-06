@@ -1,17 +1,3 @@
-// Wait for Firebase to be available
-async function waitForFirebase() {
-  return new Promise((resolve) => {
-    const checkFirebase = () => {
-      if (window.firebase && window.firebase.app) {
-        resolve();
-      } else {
-        setTimeout(checkFirebase, 100);
-      }
-    };
-    checkFirebase();
-  });
-}
-
 // Import necessary Firebase functions
 import { 
   collection, 
@@ -20,10 +6,23 @@ import {
   getDocs 
 } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js';
 
-import { 
-  onAuthStateChanged, 
-  signInAnonymously 
-} from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js';
+// Simple session key for local storage
+const SESSION_KEY = 'aaasummit_authenticated';
+const SESSION_EMAIL_KEY = 'aaasummit_authenticated_email';
+
+// Wait for Firebase to be available
+async function waitForFirebase() {
+  return new Promise((resolve, reject) => {
+    const checkFirebase = () => {
+      if (window.firebase && window.firebase.app && window.firebase.auth) {
+        resolve();
+      } else {
+        setTimeout(checkFirebase, 100);
+      }
+    };
+    checkFirebase();
+  });
+}
 
 // Helper function to validate email format
 function isValidEmail(email) {
@@ -67,84 +66,105 @@ function resetButton(button, originalText) {
     button.innerHTML = originalText;
 }
 
+// Function to check if user is authenticated
+function checkAuth() {
+    const isAuthenticated = sessionStorage.getItem(SESSION_KEY) === 'true';
+    const email = sessionStorage.getItem(SESSION_EMAIL_KEY);
+    return isAuthenticated && email;
+}
+
 document.addEventListener('DOMContentLoaded', async function() {
-    // Wait for Firebase to be ready
-    await waitForFirebase();
-    
-    const { db, auth } = window.firebase;
-    
-    if (!db || !auth) {
-        console.error('Firebase not properly initialized');
-        return;
-    }
-    const sermonAuthForm = document.getElementById('sermonAuthForm');
-    const emailInput = document.getElementById('email');
-    
-    if (sermonAuthForm) {
-        sermonAuthForm.addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            const email = emailInput.value.trim();
-            const submitBtn = this.querySelector('button[type="submit"]');
-            const originalBtnText = submitBtn.textContent;
-            
-            // Show loading state
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Verifying...';
-            
-            if (!email) {
-                showMessage('Please enter your email address', 'error');
-                resetButton(submitBtn, originalBtnText);
-                return;
-            }
+    try {
+        // Wait for Firebase to be ready
+        await waitForFirebase();
+        
+        const { db } = window.firebase;
+        
+        if (!db) {
+            console.error('Firebase not properly initialized');
+            showMessage('Failed to initialize. Please refresh the page and try again.', 'error');
+            return;
+        }
 
-            if (!isValidEmail(email)) {
-                showMessage('Please enter a valid email address', 'error');
-                resetButton(submitBtn, originalBtnText);
-                return;
+        // Handle form submission
+        const sermonAuthForm = document.getElementById('sermonAuthForm');
+        const emailInput = document.getElementById('email');
+        
+        if (sermonAuthForm) {
+            // Pre-fill email if it exists in URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const emailParam = urlParams.get('email');
+            if (emailParam && emailInput) {
+                emailInput.value = emailParam;
             }
-
-            try {
-                // Check if email exists in Firestore
-                const usersRef = collection(db, 'registrations');
-                const q = query(usersRef, where('email', '==', email));
-                const querySnapshot = await getDocs(q);
+            
+            sermonAuthForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
                 
-                if (querySnapshot.empty) {
-                    showMessage('Email not found. Please register first.', 'error');
+                const email = emailInput ? emailInput.value.trim() : '';
+                const submitBtn = this.querySelector('button[type="submit"]');
+                const originalBtnText = submitBtn.innerHTML;
+                
+                // Show loading state
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Verifying...';
+                
+                if (!email) {
+                    showMessage('Please enter your email address', 'error');
                     resetButton(submitBtn, originalBtnText);
                     return;
                 }
 
-                // Email exists, sign in anonymously to access protected content
-                try {
-                    await signInAnonymously(auth);
-                } catch (error) {
-                    console.error('Anonymous sign-in error:', error);
-                    throw error; // Re-throw to be caught by the outer try-catch
+                if (!isValidEmail(email)) {
+                    showMessage('Please enter a valid email address', 'error');
+                    resetButton(submitBtn, originalBtnText);
+                    return;
                 }
-                
-                // Store email in session storage for verification
-                sessionStorage.setItem('authenticatedEmail', email);
-                
-                // Redirect to sermons page
-                window.location.href = 'sermon.html';
-                
-            } catch (error) {
-                console.error('Authentication error:', error);
-                showMessage('An error occurred. Please try again later.', 'error');
-                resetButton(submitBtn, originalBtnText);
-            }
-        });
-    }
 
-// Check if user is already authenticated on sermon page
-    if (window.location.pathname.includes('sermon.html')) {
-        onAuthStateChanged(auth, (user) => {
-            if (!user || !sessionStorage.getItem('authenticatedEmail')) {
-                // User is not authenticated, redirect to home page
+                try {
+                    // Check if email exists in Firestore
+                    const usersRef = collection(db, 'registrations');
+                    const q = query(usersRef, where('email', '==', email));
+                    const querySnapshot = await getDocs(q);
+                    
+                    if (querySnapshot.empty) {
+                        resetButton(submitBtn, originalBtnText);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Email Not Found',
+                            text: 'The email you entered is not registered. Please provide a registered email address.',
+                            confirmButtonColor: '#271f41',
+                            confirmButtonText: 'OK',
+                            allowOutsideClick: false
+                        });
+                        return;
+                    }
+                    
+                    // Email exists, set session and redirect
+                    sessionStorage.setItem(SESSION_KEY, 'true');
+                    sessionStorage.setItem(SESSION_EMAIL_KEY, email);
+                    
+                    // Redirect to sermons page
+                    window.location.href = 'sermon.html';
+                    
+                } catch (error) {
+                    console.error('Error checking email:', error);
+                    showMessage('An error occurred. Please try again later.', 'error');
+                    resetButton(submitBtn, originalBtnText);
+                }
+            });
+        }
+
+        // Check if user is already authenticated on sermon page
+        if (window.location.pathname.includes('sermon.html')) {
+            if (!checkAuth()) {
+                // Store the current URL to redirect back after login
+                sessionStorage.setItem('redirectAfterLogin', window.location.href);
                 window.location.href = 'index.html';
             }
-        });
+        }
+    } catch (error) {
+        console.error('Initialization error:', error);
+        showMessage('Failed to initialize. Please refresh the page and try again.', 'error');
     }
 });

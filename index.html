@@ -387,7 +387,7 @@
       Enter your registered email to watch, listen, or download the sermons.
     </p>
 
-    <form action="sermon.html" method="GET" class="sermon-form">
+    <form id="sermonAuthForm" class="sermon-form" onsubmit="return false;">
       <div class="input-group">
         <label for="email">Registered Email</label>
         <input 
@@ -398,14 +398,13 @@
           required
         />
       </div>
-
       <button type="submit" class="btn-submit">Access Sermons</button>
     </form>
 
   </div>  
           
         </div>
-    </section>
+<script type="module" src="sermon-auth.js"></script>
 
     <!-- Footer -->
     <footer class="footer">
