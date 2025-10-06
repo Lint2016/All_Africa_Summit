@@ -480,55 +480,73 @@
                     </div>
                 </div>
             </div>
-            <div class="footer-bottom">
-                <p>&copy; 2025 All Africa Apostolic Summit. All Rights Reserved.</p>
-            </div>
         </div>
     </footer>
 
-    <script type="module" src="firebase-init.js"></script>
-    <script type="module" src="sermon-auth.js"></script>
     <script>
-        // Authentication is now handled in sermon-auth.js
+        // Tab functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll(".tab").forEach(tab => {
+                tab.addEventListener("click", () => {
+                    const tabs = document.querySelectorAll(".tab");
+                    const tabContents = document.querySelectorAll(".tab-content");
+                    
+                    tabs.forEach(t => t.classList.remove("active"));
+                    tabContents.forEach(c => c.classList.remove("active"));
 
-         // Tab Switching
-    const tabs = document.querySelectorAll(".tab");
-    const tabContents = document.querySelectorAll(".tab-content");
+                    tab.classList.add("active");
+                    document.getElementById(tab.dataset.tab).classList.add("active");
+                });
+            });
 
-    tabs.forEach(tab => {
-      tab.addEventListener("click", () => {
-        tabs.forEach(t => t.classList.remove("active"));
-        tabContents.forEach(c => c.classList.remove("active"));
+            // Share Buttons
+            const baseUrl = window.location.origin + window.location.pathname;
+            document.querySelectorAll(".sermon-card").forEach(card => {
+                const sermonId = card.id;
+                const shareUrl = `${baseUrl}#${sermonId}`;
 
-        tab.classList.add("active");
-        document.getElementById(tab.dataset.tab).classList.add("active");
-      });
-    });
+                // Facebook
+                const fb = card.querySelector(".fb-share");
+                if (fb) {
+                    fb.href = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`;
+                }
 
-    // Share Buttons
-    const baseUrl = window.location.origin + window.location.pathname;
-    document.querySelectorAll(".sermon-card").forEach(card => {
-      const sermonId = card.id;
-      const shareUrl = `${baseUrl}#${sermonId}`;
+                // WhatsApp
+                const wa = card.querySelector(".wa-share");
+                if (wa) {
+                    wa.href = `https://api.whatsapp.com/send?text=Check%20out%20this%20sermon:%20${encodeURIComponent(shareUrl)}`;
+                }
 
-      // Facebook
-      const fb = card.querySelector(".fb-share");
-      fb.href = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`;
-
-      // WhatsApp
-      const wa = card.querySelector(".wa-share");
-      wa.href = `https://api.whatsapp.com/send?text=Check%20out%20this%20sermon:%20${encodeURIComponent(shareUrl)}`;
-
-      // Copy Link
-      const copyBtn = card.querySelector(".copy-link");
-      copyBtn.addEventListener("click", () => {
-        navigator.clipboard.writeText(shareUrl).then(() => {
-          alert("🔗 Link copied to clipboard!");
+                // Copy Link
+                const copyBtn = card.querySelector(".copy-link");
+                if (copyBtn) {
+                    copyBtn.addEventListener("click", () => {
+                        navigator.clipboard.writeText(shareUrl).then(() => {
+                            const Toast = Swal.mixin({
+                                toast: true,
+                                position: 'top-end',
+                                showConfirmButton: false,
+                                timer: 3000,
+                                timerProgressBar: true,
+                                didOpen: (toast) => {
+                                    toast.addEventListener('mouseenter', Swal.stopTimer);
+                                    toast.addEventListener('mouseleave', Swal.resumeTimer);
+                                }
+                            });
+                            
+                            Toast.fire({
+                                icon: 'success',
+                                title: 'Link copied to clipboard!',
+                                iconColor: '#271f41',
+                                background: '#fefae0',
+                                color: '#271f41'
+                            });
+                        });
+                    });
+                }
+            });
         });
-      });
-    });
-
-        
     </script>
+    <script src="index.js"></script>
 </body>
 </html>
