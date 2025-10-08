@@ -11,7 +11,7 @@ export async function handler(event) {
     : "https://api-m.sandbox.paypal.com";
 
   const auth = Buffer.from(
-    `${process.env.PAYPAL_CLIENT_ID}:${process.env.PAYPAL_CLIENT_SECRET}`
+    `${process.env.AYxQrIu7g_X2H4-BDCagFDgP4IDm1nnaZqAIKKWgqLlx6GFv5-SIRaQncounByxoJ-QGDS4g2Tzxj2rP}:${process.env.EMr9FrFd3PVHSccySVBqCbFu3G1DmVuNkYsq2RnxOeMhsOuSKEdKOSKrbgy-ArVWTR9MR2IWuqTQ8Unv}`
   ).toString("base64");
 
   // 1. Get access token
