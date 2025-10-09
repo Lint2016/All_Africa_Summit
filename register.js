@@ -1,3 +1,26 @@
+// Firebase config
+const firebaseConfig = {
+  apiKey: "AIzaSyAl5oR3RvlgP8b9WvdxZaPvkc0rMb_R94M",
+  authDomain: "aaasummit-d063e.firebaseapp.com",
+  projectId: "aaasummit-d063e",
+  storageBucket: "aaasummit-d063e.appspot.com",
+  messagingSenderId: "44977763419",
+  appId: "1:44977763419:web:e3c5bd14fc98d724da3b7e",
+  measurementId: "G-YWLCPLNLPZ"
+};
+
+// Initialize Firebase
+let app;
+let functions;
+
+try {
+  app = firebase.initializeApp(firebaseConfig);
+  functions = firebase.functions();
+  console.log('Firebase initialized successfully');
+} catch (error) {
+  console.error('Firebase initialization error:', error);
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     // Mobile Navigation Toggle
     const hamburger = document.querySelector('.hamburger');
@@ -118,20 +141,44 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // PayPal integration
     if (paypalBtn) {
-        paypalBtn.addEventListener('click', () => {
-            // Create order server-side
-            fetch('/.netlify/functions/create-order', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ amount: '10.00', currency: 'USD' })
-            })
-            .then(r => r.json())
-            .then(({ approval }) => {
-                if (approval) {
-                    window.location.href = approval; // redirect to PayPal
+        paypalBtn.addEventListener('click', async () => {
+            try {
+                if (!app) {
+                    throw new Error('Firebase not initialized');
                 }
-            })
-            .catch(err => console.error('Create order error', err));
+                
+                const createOrder = functions.httpsCallable('createOrder');
+                console.log('Sending createOrder request...');
+                
+                const result = await createOrder({ 
+                    amount: '1.00', 
+                    currency: 'USD' 
+                });
+                
+                console.log('Order created:', result);
+                
+                if (result && result.data && result.data.id) {
+                    // First, save the order ID in session storage
+                    sessionStorage.setItem('paypal_order_id', result.data.id);
+                    
+                    // Get the approval URL from the response
+                    const approvalUrl = result.data.links?.find(link => 
+                        link.rel === 'approve'
+                    )?.href;
+                    
+                    if (approvalUrl) {
+                        // Redirect to PayPal's approval URL
+                        window.location.href = approvalUrl;
+                    } else {
+                        throw new Error('No approval URL found in PayPal response');
+                    }
+                } else {
+                    throw new Error('Invalid response from server');
+                }
+            } catch (err) {
+                console.error('Create order error:', err);
+                alert('Error creating PayPal order: ' + (err.message || 'Unknown error'));
+            }
         });
     }
 
@@ -147,7 +194,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const res = await fetch('/.netlify/functions/payfast-create', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ amount: '10.00', buyer })
+                    body: JSON.stringify({ amount: '1.00', buyer })
                 });
                 const data = await res.json();
                 if (data && data.redirect) {
