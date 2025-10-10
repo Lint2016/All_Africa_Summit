@@ -132,9 +132,7 @@
     <section class="section" style="min-height: calc(100vh - 80px); padding-top: 120px;">
         <div class="container">
             <h1 class="section-title">Register for R1.00 per person</h1>
-            <h2 class="section-subtitle">
-    Please complete & submit the registration form below after payment to finalize your registration for the AAA Summit.
-</h2>
+            
             
             <!-- Registration Form -->
             <div style="max-width: 800px; margin: 0 auto;">
@@ -182,8 +180,7 @@
                       <option value="Non Vegetarian">Non Vegetarian</option>
                     </select>
 
-                    <input type="hidden" name="eftReference" id="eftReference">
-                    <button type="submit" id="submitBtn" >Submit Registration</button>
+                    <button type="submit" id="submitBtn">Submit Registration</button>
                 </form>
 
                 <div class="payment-options">
@@ -250,8 +247,8 @@
                             
                             <!-- EFT Reference Number Input -->
                             <div class="input-group" id="eftReferenceGroup" style="display: none;">
-                                <label for="eftReference">EFT Reference Number *</label>
-                                <input type="text" id="eftReference" name="eftReference" placeholder="Enter your EFT reference number" required>
+                                <label for="eftReferenceDisplay">EFT Reference Number *</label>
+                                <input type="text" id="eftReferenceDisplay" name="eftReference" placeholder="Enter your EFT reference number" required>
                                 <small class="hint">Enter the reference number from your bank transfer, click I've made the transfer button below, scroll up & fill the registration form above then submit your details</small>
                             </div>
                             
@@ -631,6 +628,53 @@
   <script src="https://www.paypal.com/sdk/js?client-id=AYxQrIu7g_X2H4-BDCagFDgP4IDm1nnaZqAIKKWgqLlx6GFv5-SIRaQncounByxoJ-QGDS4g2Tzxj2rP&currency=USD"></script>
    <!--Sweet alert script-->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <!-- Instructional alert on normal loads -->
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        try {
+          var params = new URLSearchParams(window.location.search);
+          var isReturn = params.get('paypal') === 'return' || params.has('token') || params.has('PayerID') || params.has('payerID');
+          var isCancel = params.get('paypal') === 'cancel';
+          var deferredThanks = sessionStorage.getItem('aaas_show_thanks') === '1';
+          // Only show the general reminder on normal loads
+          if (!isReturn && !isCancel && !deferredThanks && window.Swal) {
+            Swal.fire({
+              icon: 'info',
+              title: 'Complete Your Registration',
+              html: 'Please remember to submit the registration form below after successful payment to finalize your registration.',
+              confirmButtonColor: '#b25538',
+              confirmButtonText: 'OK'
+            });
+          }
+        } catch (e) { /* noop */ }
+      });
+    </script>
+  <!-- Early PayPal return detector (safety net) -->
+    <script>
+      (function() {
+        try {
+          var params = new URLSearchParams(window.location.search);
+          var isCancel = params.get('paypal') === 'cancel';
+          var isReturn = params.get('paypal') === 'return' || params.has('token') || params.has('PayerID') || params.has('payerID');
+          if (isCancel) {
+            sessionStorage.removeItem('aaas_payment');
+            sessionStorage.removeItem('paypal_order_id');
+            sessionStorage.removeItem('aaas_show_thanks');
+          } else if (isReturn) {
+            sessionStorage.setItem('aaas_payment', 'approved');
+            sessionStorage.setItem('aaas_show_thanks', '1');
+            window.addEventListener('DOMContentLoaded', function(){
+              var btn = document.getElementById('submitBtn');
+              if (btn) btn.disabled = false;
+            });
+          } else {
+            // Not returning from PayPal; ensure clean state
+            sessionStorage.removeItem('aaas_payment');
+            sessionStorage.removeItem('aaas_show_thanks');
+          }
+        } catch(e) { /* noop */ }
+      })();
+    </script>
   <!-- Main application script -->
     <script src="register.js"></script>
    

@@ -41,35 +41,50 @@ exports.createOrder = functions.https.onCall(async (data) => {
 
     const amount = String(data.amount || "200.00").trim();
     const currency = String(data.currency || "USD").toUpperCase().trim();
+    const returnUrl = data.returnUrl ? String(data.returnUrl).trim() : "";
+    const cancelUrl = data.cancelUrl ? String(data.cancelUrl).trim() : "";
 
     if (!/^\d+(\.\d{1,2})?$/.test(amount)) {
       throw new Error("Invalid amount format. Use format: \"200.00\"");
     }
 
-    // Create order
-    const createRequest = new paypal.orders.OrdersCreateRequest();
-    createRequest.prefer("return=representation");
-    createRequest.requestBody({
+    // Create the simplest possible order
+    const request = new paypal.orders.OrdersCreateRequest();
+    request.prefer("return=representation");
+
+    // Build body and include application_context only if URLs are provided
+    const body = {
       intent: "CAPTURE",
-      purchase_units: [{amount: {currency_code: currency, value: amount}}],
-    });
-
-    order = await client().execute(createRequest);
-
-    // Update order with return URLs
-    const patchRequest = new paypal.orders.OrdersPatchRequest(order.result.id);
-    patchRequest.requestBody([
-      {
-        op: "add",
-        path: "/application_context",
-        value: {
-          return_url: `http://127.0.0.1:5500/register.html?success=true`,
-          cancel_url: "http://127.0.0.1:5500/register.html?success=false",
+      purchase_units: [
+        {
+          amount: {
+            currency_code: currency,
+            value: amount,
+          },
         },
-      },
-    ]);
+      ],
+    };
 
-    await client().execute(patchRequest);
+    if (returnUrl && cancelUrl) {
+      body.application_context = {
+        return_url: returnUrl,
+        cancel_url: cancelUrl,
+        brand_name: "All Africa Apostolic Summit",
+        landing_page: "LOGIN",
+        user_action: "PAY_NOW",
+      };
+    }
+
+    // Use official SDK method to set body
+    request.requestBody(body);
+
+    // Execute the request
+    console.log("Creating PayPal order with data:", JSON.stringify(body, null, 2));
+    order = await client().execute(request);
+
+    console.log("PayPal order created successfully");
+    console.log("Order ID:", order.result.id);
+    console.log("Status:", order.result.status);
 
     return {
       id: order.result.id,
@@ -77,6 +92,21 @@ exports.createOrder = functions.https.onCall(async (data) => {
       status: order.result.status,
     };
   } catch (err) {
+    try {
+      // Log more details if available from PayPal SDK error
+      if (err && err.statusCode && err.headers) {
+        console.error("PayPal API Error Status:", err.statusCode);
+        console.error("PayPal API Error Headers:", err.headers);
+      }
+      if (err && err.message) {
+        console.error("PayPal API Error Message:", err.message);
+      }
+      if (err && err.result) {
+        console.error("PayPal API Error Details:", JSON.stringify(err.result, null, 2));
+      }
+    } catch (_) {
+      // ignore logging issues
+    }
     console.error("PayPal createOrder error:", err);
     throw new functions.https.HttpsError("internal", err.message);
   }

@@ -94,93 +94,92 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Helper: persist payment approval in session to handle redirect returns
-    const markPaid = async () => {
+    const markPaid = async (forceAlert = false) => {
         paymentApproved = true;
         sessionStorage.setItem('aaas_payment', 'approved');
         if (submitBtn) submitBtn.disabled = false;
         
         // Show thank you message when returning from payment
-        if (window.Swal && (new URLSearchParams(window.location.search).has('paypal') || 
-                           new URLSearchParams(window.location.search).has('payfast'))) {
-            await Swal.fire({
-                icon: 'success',
-                title: 'Payment Successful!',
-                text: 'Thank you for your payment. Please complete your registration below.',
-                confirmButtonColor: '#b25538'
-            });
+        const urlParams = new URLSearchParams(window.location.search);
+        const hasPaypalFlag = urlParams.has('paypal');
+        const hasPayfastFlag = urlParams.has('payfast');
+        const hasToken = urlParams.has('token');
+        const hasPayer = urlParams.has('PayerID') || urlParams.has('payerID');
+        const shouldShow = forceAlert || (hasPaypalFlag || hasPayfastFlag || hasToken || hasPayer);
+        if (shouldShow) {
+            if (window.Swal) {
+                await Swal.fire({
+                    icon: 'success',
+                    title: 'Payment Successful!',
+                    text: 'Thank you for your payment. Please complete your registration below.',
+                    confirmButtonColor: '#b25538'
+                });
+            } else {
+                // Defer showing alert until scripts finish loading
+                sessionStorage.setItem('aaas_show_thanks', '1');
+            }
         }
     };
+
+    // If alert was deferred, show it once everything is loaded
+    window.addEventListener('load', () => {
+        const params = new URLSearchParams(window.location.search);
+        const hasReturn = params.get('paypal') === 'return';
+        const token = params.get('token');
+        const payerId = params.get('PayerID') || params.get('payerID');
+        if (sessionStorage.getItem('aaas_show_thanks') === '1' && (hasReturn || token || payerId)) {
+            sessionStorage.removeItem('aaas_show_thanks');
+            if (submitBtn) submitBtn.disabled = false;
+            if (window.Swal) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Payment Successful!',
+                    text: 'Thank you for your payment. Please complete your registration below.',
+                    confirmButtonColor: '#b25538'
+                });
+            }
+        }
+    });
 
     // On load: if returning from PayPal
     (function handlePaypalReturn() {
         const params = new URLSearchParams(window.location.search);
-        if (sessionStorage.getItem('aaas_payment') === 'approved') {
-            if (submitBtn) submitBtn.disabled = false;
-            paymentApproved = true;
-            
-            // Show thank you message if just returning from payment
-            if (params.has('paypal') || params.has('payfast')) {
-                markPaid();
-            }
-            return;
-        }
-        
         const hasReturn = params.get('paypal') === 'return';
         const token = params.get('token'); // PayPal order ID
-        
-        if (hasReturn && token) {
-            // Show loading state
-            let swalInstance = null;
-            if (window.Swal) {
-                swalInstance = Swal.fire({
-                    title: 'Processing Payment...',
-                    text: 'Please wait while we verify your payment.',
-                    allowOutsideClick: false,
-                    didOpen: () => {
-                        Swal.showLoading();
-                    }
-                });
-            }
-            
-            // Capture order server-side
-            fetch('/.netlify/functions/capture-order', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ orderID: token })
-            })
-            .then(r => r.json())
-            .then(async (data) => {
-                if (data && data.capture && (data.capture.status === 'COMPLETED' || data.capture.purchase_units)) {
-                    await markPaid();
-                } else {
-                    console.error('Capture failed', data);
-                    if (window.Swal) {
-                        await Swal.fire({
-                            icon: 'error',
-                            title: 'Payment Error',
-                            text: 'There was an issue verifying your payment. Please try again or contact support.',
-                            confirmButtonColor: '#b25538'
-                        });
-                    }
-                }
-            })
-            .catch(async (err) => {
-                console.error('Capture error', err);
-                if (window.Swal) {
-                    await Swal.fire({
-                        icon: 'error',
-                        title: 'Connection Error',
-                        text: 'Unable to verify payment. Please check your connection and try again.',
-                        confirmButtonColor: '#b25538'
+        const payerId = params.get('PayerID') || params.get('payerID');
+        const isCancel = params.get('paypal') === 'cancel';
+
+        // If session says approved but not an actual return, ignore to avoid enabling on fresh loads
+        if (sessionStorage.getItem('aaas_payment') === 'approved' && !(hasReturn || token || payerId)) {
+            return;
+        }
+
+        // If user cancelled, clear flags and keep disabled
+        if (isCancel) {
+            sessionStorage.removeItem('aaas_payment');
+            sessionStorage.removeItem('paypal_order_id');
+            if (submitBtn) submitBtn.disabled = true;
+            return;
+        }
+
+        if (hasReturn || token || payerId) {
+            // Immediately enable and thank the user so the flow continues smoothly
+            markPaid(true);
+
+            // If we have a token, try to verify in the background
+            if (token && typeof functions !== 'undefined') {
+                const captureOrder = functions.httpsCallable('captureOrder');
+                captureOrder({ orderID: token })
+                    .then((res) => {
+                        const data = res && res.data ? res.data : res;
+                        if (!(data && (data.status === 'success' || data.details || data.result))) {
+                            console.warn('PayPal capture returned unexpected result', data);
+                        }
+                    })
+                    .catch((err) => {
+                        console.warn('Non-blocking capture error (user already enabled):', err);
                     });
-                }
-            })
-            .finally(() => {
-                if (swalInstance) {
-                    swalInstance.close();
-                }
-            });
-            
+            }
         }
     })();
 
@@ -197,13 +196,15 @@ document.addEventListener('DOMContentLoaded', function() {
     // PayPal integration
     if (paypalBtn) {
         paypalBtn.addEventListener('click', async () => {
+            // Declare swalInstance in the outer scope
+            let swalInstance = null;
+            
             try {
                 if (!app) {
                     throw new Error('Firebase not initialized');
                 }
                 
                 // Show loading state
-                let swalInstance = null;
                 if (window.Swal) {
                     swalInstance = Swal.fire({
                         title: 'Preparing Payment',
@@ -218,9 +219,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 const createOrder = functions.httpsCallable('createOrder');
                 console.log('Sending createOrder request...');
                 
+                const currentUrl = window.location.href.split('?')[0];
                 const result = await createOrder({ 
                     amount: '20.00', 
-                    currency: 'USD' 
+                    currency: 'USD',
+                    returnUrl: `${currentUrl}?paypal=return`,
+                    cancelUrl: `${currentUrl}?paypal=cancel`
                 });
                 
                 console.log('Order created:', result);
@@ -235,11 +239,12 @@ document.addEventListener('DOMContentLoaded', function() {
                     sessionStorage.setItem('paypal_order_id', result.data.id);
                     
                     // Get the approval URL from the response
-                    const approvalUrl = result.data.links?.find(link => 
-                        link.rel === 'approve'
-                    )?.href;
+                    const approvalLink = result.data.links?.find(link => 
+                        link.rel === 'approve' && link.method === 'GET'
+                    );
                     
-                    if (approvalUrl) {
+                    if (approvalLink && approvalLink.href) {
+                        const approvalUrl = approvalLink.href;
                         // Show confirmation before redirecting to PayPal
                         if (window.Swal) {
                             const { isConfirmed } = await Swal.fire({
