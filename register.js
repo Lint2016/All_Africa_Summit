@@ -94,10 +94,21 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Helper: persist payment approval in session to handle redirect returns
-    const markPaid = () => {
+    const markPaid = async () => {
         paymentApproved = true;
         sessionStorage.setItem('aaas_payment', 'approved');
         if (submitBtn) submitBtn.disabled = false;
+        
+        // Show thank you message when returning from payment
+        if (window.Swal && (new URLSearchParams(window.location.search).has('paypal') || 
+                           new URLSearchParams(window.location.search).has('payfast'))) {
+            await Swal.fire({
+                icon: 'success',
+                title: 'Payment Successful!',
+                text: 'Thank you for your payment. Please complete your registration below.',
+                confirmButtonColor: '#b25538'
+            });
+        }
     };
 
     // On load: if returning from PayPal
@@ -106,11 +117,31 @@ document.addEventListener('DOMContentLoaded', function() {
         if (sessionStorage.getItem('aaas_payment') === 'approved') {
             if (submitBtn) submitBtn.disabled = false;
             paymentApproved = true;
+            
+            // Show thank you message if just returning from payment
+            if (params.has('paypal') || params.has('payfast')) {
+                markPaid();
+            }
             return;
         }
+        
         const hasReturn = params.get('paypal') === 'return';
         const token = params.get('token'); // PayPal order ID
+        
         if (hasReturn && token) {
+            // Show loading state
+            let swalInstance = null;
+            if (window.Swal) {
+                swalInstance = Swal.fire({
+                    title: 'Processing Payment...',
+                    text: 'Please wait while we verify your payment.',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+            }
+            
             // Capture order server-side
             fetch('/.netlify/functions/capture-order', {
                 method: 'POST',
@@ -118,14 +149,37 @@ document.addEventListener('DOMContentLoaded', function() {
                 body: JSON.stringify({ orderID: token })
             })
             .then(r => r.json())
-            .then(data => {
+            .then(async (data) => {
                 if (data && data.capture && (data.capture.status === 'COMPLETED' || data.capture.purchase_units)) {
-                    markPaid();
+                    await markPaid();
                 } else {
                     console.error('Capture failed', data);
+                    if (window.Swal) {
+                        await Swal.fire({
+                            icon: 'error',
+                            title: 'Payment Error',
+                            text: 'There was an issue verifying your payment. Please try again or contact support.',
+                            confirmButtonColor: '#b25538'
+                        });
+                    }
                 }
             })
-            .catch(err => console.error('Capture error', err));
+            .catch(async (err) => {
+                console.error('Capture error', err);
+                if (window.Swal) {
+                    await Swal.fire({
+                        icon: 'error',
+                        title: 'Connection Error',
+                        text: 'Unable to verify payment. Please check your connection and try again.',
+                        confirmButtonColor: '#b25538'
+                    });
+                }
+            })
+            .finally(() => {
+                if (swalInstance) {
+                    swalInstance.close();
+                }
+            });
         }
     })();
 
@@ -147,6 +201,19 @@ document.addEventListener('DOMContentLoaded', function() {
                     throw new Error('Firebase not initialized');
                 }
                 
+                // Show loading state
+                let swalInstance = null;
+                if (window.Swal) {
+                    swalInstance = Swal.fire({
+                        title: 'Preparing Payment',
+                        text: 'Please wait while we connect to PayPal...',
+                        allowOutsideClick: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
+                }
+                
                 const createOrder = functions.httpsCallable('createOrder');
                 console.log('Sending createOrder request...');
                 
@@ -156,6 +223,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
                 
                 console.log('Order created:', result);
+                
+                // Close loading state
+                if (swalInstance) {
+                    await swalInstance.close();
+                }
                 
                 if (result && result.data && result.data.id) {
                     // First, save the order ID in session storage
@@ -167,8 +239,28 @@ document.addEventListener('DOMContentLoaded', function() {
                     )?.href;
                     
                     if (approvalUrl) {
-                        // Redirect to PayPal's approval URL
-                        window.location.href = approvalUrl;
+                        // Show confirmation before redirecting to PayPal
+                        if (window.Swal) {
+                            const { isConfirmed } = await Swal.fire({
+                                title: 'Redirecting to PayPal',
+                                text: 'You will be redirected to PayPal to complete your payment of $20.00',
+                                icon: 'info',
+                                showCancelButton: true,
+                                confirmButtonColor: '#b25538',
+                                cancelButtonColor: '#6c757d',
+                                confirmButtonText: 'Proceed to PayPal',
+                                cancelButtonText: 'Cancel',
+                                reverseButtons: true
+                            });
+                            
+                            if (isConfirmed) {
+                                // Redirect to PayPal's approval URL
+                                window.location.href = approvalUrl;
+                            }
+                        } else {
+                            // If SweetAlert is not available, just redirect
+                            window.location.href = approvalUrl;
+                        }
                     } else {
                         throw new Error('No approval URL found in PayPal response');
                     }
@@ -177,7 +269,23 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             } catch (err) {
                 console.error('Create order error:', err);
-                alert('Error creating PayPal order: ' + (err.message || 'Unknown error'));
+                
+                // Close loading state if it's still open
+                if (swalInstance) {
+                    await swalInstance.close();
+                }
+                
+                // Show error message
+                if (window.Swal) {
+                    await Swal.fire({
+                        icon: 'error',
+                        title: 'Payment Error',
+                        text: 'Error creating PayPal order: ' + (err.message || 'Unknown error'),
+                        confirmButtonColor: '#b25538'
+                    });
+                } else {
+                    alert('Error creating PayPal order: ' + (err.message || 'Unknown error'));
+                }
             }
         });
     }
@@ -191,6 +299,13 @@ document.addEventListener('DOMContentLoaded', function() {
     if (formEl) {
         formEl.addEventListener('submit', async (e) => {
             e.preventDefault();
+            
+            // Disable submit button to prevent multiple submissions
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.style.cursor = 'not-allowed';
+            }
+            
             if (!paymentApproved) {
                 if (window.Swal) {
                     await Swal.fire({
@@ -200,57 +315,103 @@ document.addEventListener('DOMContentLoaded', function() {
                         confirmButtonColor: '#b25538'
                     });
                 }
+                if (submitBtn) submitBtn.disabled = false;
                 return;
             }
+            
             const fd = new FormData(formEl);
             const formData = Object.fromEntries(fd.entries());
+            const submitText = submitBtn ? submitBtn.textContent : 'Submit';
+            
+            if (submitBtn) {
+                submitBtn.textContent = 'Submitting...';
+                submitBtn.disabled = true;
+            }
 
-            // Write to Firebase Firestore
+            // Show loading state
+            let swalInstance = null;
+            if (window.Swal) {
+                swalInstance = Swal.fire({
+                    title: 'Processing...',
+                    text: 'Please wait while we process your registration.',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+            }
+
             try {
+                // Write to Firebase Firestore
                 if (window.db) {
-                    // Import addDoc and collection for modular Firebase
                     const { addDoc, collection } = await import('firebase/firestore');
                     await addDoc(collection(window.db, 'registrations'), {
                         ...formData,
+                        paymentStatus: 'completed',
+                        paymentMethod: 'PayPal',
+                        paymentAmount: '20.00',
+                        paymentDate: new Date().toISOString(),
                         createdAt: new Date().toISOString()
                     });
                 }
-            } catch (err) {
-                console.error('Firestore write failed', err);
-            }
 
-            // Send to Formspree
-            try {
+                // Send to Formspree
                 const FORMSPREE_ENDPOINT = 'https://formspree.io/f/xgvnvzzr';
-                const submitText = submitBtn.textContent;
-                submitBtn.textContent = 'Submitting...';
-                submitBtn.disabled = true;
                 const res = await fetch(FORMSPREE_ENDPOINT, {
                     method: 'POST',
                     headers: { 'Accept': 'application/json' },
                     body: fd
                 });
+                
                 if (!res.ok) {
-                    console.error('Formspree response error', await res.text());
+                    throw new Error('Failed to submit form');
                 }
-                submitBtn.textContent = submitText;
-            } catch (err) {
-                console.error('Formspree failed', err);
-            }
 
-            if (window.Swal) {
-                await Swal.fire({
-                    icon: 'success',
-                    title: 'Registration submitted',
-                    text: 'Thank you! We have received your details.',
-                    confirmButtonColor: '#b25538'
-                });
+                // Close loading state
+                if (swalInstance) {
+                    await swalInstance.close();
+                }
+
+                // Show success message
+                if (window.Swal) {
+                    await Swal.fire({
+                        icon: 'success',
+                        title: 'Registration Successful!',
+                        html: 'Thank you for registering for the All  Africa Apostolic Summit!<br><br>You will receive a welcome email with further details within 24-48 hours.',
+                        confirmButtonColor: '#b25538',
+                        allowOutsideClick: false
+                    });
+                }
+                
+                // Reset form and state
+                sessionStorage.removeItem('aaas_payment');
+                formEl.reset();
+                paymentApproved = false;
+                
+            } catch (err) {
+                console.error('Submission error:', err);
+                
+                // Close loading state if it's still open
+                if (swalInstance) {
+                    await swalInstance.close();
+                }
+                
+                // Show error message
+                if (window.Swal) {
+                    await Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'There was an error processing your registration. Please try again.',
+                        confirmButtonColor: '#b25538'
+                    });
+                }
+                
+                // Re-enable the submit button on error
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = submitText;
+                }
             }
-            
-            sessionStorage.removeItem('aaas_payment');
-            formEl.reset();
-            if (submitBtn) submitBtn.disabled = true;
-            paymentApproved = false;
         });
     }
 
