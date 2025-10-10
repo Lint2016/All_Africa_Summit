@@ -35,44 +35,45 @@ function client() {
 
 // Create PayPal order
 exports.createOrder = functions.https.onCall(async (data) => {
+  let order; // declare outside try/catch to avoid "before initialization"
   try {
-    // Input validation
-    if (!data) {
-      throw new Error("No data provided");
-    }
+    if (!data) throw new Error("No data provided");
 
     const amount = String(data.amount || "200.00").trim();
     const currency = String(data.currency || "USD").toUpperCase().trim();
 
-    // Validate amount format (should be a valid number with up to 2 decimal places)
     if (!/^\d+(\.\d{1,2})?$/.test(amount)) {
       throw new Error("Invalid amount format. Use format: \"200.00\"");
     }
 
-    const request = new paypal.orders.OrdersCreateRequest();
-    request.prefer("return=representation");
-    request.requestBody({
+    // Create order
+    const createRequest = new paypal.orders.OrdersCreateRequest();
+    createRequest.prefer("return=representation");
+    createRequest.requestBody({
       intent: "CAPTURE",
-      purchase_units: [
-        {
-          amount: {
-            currency_code: currency,
-            value: amount,
-          },
-        },
-      ],
-      application_context: {
-        return_url: "http://127.0.0.1:5500/register.html?success=true",
-        cancel_url: "http://127.0.0.1:5500/register.html?success=false",
-      },
+      purchase_units: [{amount: {currency_code: currency, value: amount}}],
     });
 
-    const order = await client().execute(request);
+    order = await client().execute(createRequest);
 
-    // Return the order ID and approval URL
+    // Update order with return URLs
+    const patchRequest = new paypal.orders.OrdersPatchRequest(order.result.id);
+    patchRequest.requestBody([
+      {
+        op: "add",
+        path: "/application_context",
+        value: {
+          return_url: `http://127.0.0.1:5500/register.html?success=true`,
+          cancel_url: "http://127.0.0.1:5500/register.html?success=false",
+        },
+      },
+    ]);
+
+    await client().execute(patchRequest);
+
     return {
       id: order.result.id,
-      links: order.result.links, // This contains the approval URL
+      links: order.result.links,
       status: order.result.status,
     };
   } catch (err) {
@@ -80,7 +81,6 @@ exports.createOrder = functions.https.onCall(async (data) => {
     throw new functions.https.HttpsError("internal", err.message);
   }
 });
-
 
 // Capture PayPal order
 exports.captureOrder = functions.https.onCall(async (data) => {
