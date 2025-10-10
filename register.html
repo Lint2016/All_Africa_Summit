@@ -180,6 +180,65 @@
                       <option value="Non Vegetarian">Non Vegetarian</option>
                     </select>
 
+                    <fieldset style="margin-top: 1rem; border: 1px solid #333; padding: 1rem; border-radius: 8px;">
+                      <legend style="padding: 0 8px; font-weight: 600; color:#333">Payment Method</legend>
+                      <div class="radio-group" role="radiogroup" aria-label="Payment Method">
+                        <label style="display: inline-flex; align-items: center; margin-right: 1rem; gap: 0.4rem;">
+                          <input type="radio" name="paymentMethod" value="eft" required>
+                          EFT 
+                        </label>
+                        <label style="display: inline-flex; align-items: center; margin-right: 1rem; gap: 0.4rem;">
+                          <input type="radio" name="paymentMethod" value="paypal">
+                          PayPal
+                        </label>
+                        <label style="display: inline-flex; align-items: center; gap: 0.4rem;">
+                          <input type="radio" name="paymentMethod" value="payfast">
+                          PayFast
+                        </label>
+                      </div>
+                    </fieldset>
+
+                    <!-- EFT Bank Details Panel (moved near radios for visibility) -->
+                    <div class="bank-details-panel" id="bankDetailsPanel" style="display: none; margin-top: 1rem;">
+                        <p class="bank-note">Direct Deposit may take 24–48 hours for verification; only then you will receive your welcome email.</p>
+                        <div class="bank-info">
+                            <div class="bank-detail-row">
+                                <span class="bank-label">Account Name:</span>
+                                <span class="bank-value">Teleios Publishing Group Pty Ltd</span>
+                            </div>
+                            <div class="bank-detail-row">
+                                <span class="bank-label">Bank:</span>
+                                <span class="bank-value">FNB</span>
+                            </div>
+                            <div class="bank-detail-row">
+                                <span class="bank-label">Account Number:</span>
+                                <div class="bank-value-with-copy">
+                                    <span id="accountNumberEFT" class="bank-value"> 62738987835</span>
+                                    <button type="button" class="copy-btn" data-clipboard-target="#accountNumberEFT" title="Copy to clipboard">📋</button>
+                                </div>
+                            </div>
+                            <div class="bank-detail-row">
+                                <span class="bank-label">Branch Code:</span>
+                                <span class="bank-value">250655</span>
+                            </div>
+                            <div class="bank-detail-row">
+                                <span class="bank-label">Reference:</span>
+                                <span class="bank-value">AAAS + Your Full Name</span>
+                            </div>
+                        </div>
+
+                        <!-- EFT Reference Number Input -->
+                        <div class="input-group" id="eftReferenceGroup" style="display: none;">
+                            <label for="eftReferenceDisplay">EFT Reference Number *</label>
+                            <input type="text" id="eftReferenceDisplay" name="eftReference" placeholder="Enter your EFT reference number" required>
+                            <small class="hint">Enter the reference number from your bank transfer, then click "I've Made the Transfer". Your reference will be recorded for verification.</small>
+                        </div>
+                        
+                        <button type="button" class="cta bank-confirm-btn" id="confirmBankTransfer" style="display: none; margin-top: 1rem;">
+                            I've Made the Transfer
+                        </button>
+                    </div>
+
                     <button type="submit" id="submitBtn">Submit Registration</button>
                 </form>
 
@@ -211,10 +270,9 @@
                     <div class="payment-card bank-transfer" data-payment-method="bank">
                         <img src="images/fnb_logo.png" alt="Bank Transfer Logo">
                         <p>Direct bank transfer</p>
-                        <button type="button" class="cta bank-btn select-payment" id="selectBankTransfer">Select Bank Transfer</button>
                         
                         <!-- Bank Details Panel -->
-                        <div class="bank-details-panel" id="bankDetailsPanel" style="display: none;">
+                        <div class="bank-details-panel" id="bankDetailsPanelLegacy" style="display: none;">
                             <p class="bank-note">Direct Deposit may take 24–48 hours for verification, only then you will receive your welcome email.</p>
                             
                             <div class="bank-info">
@@ -246,15 +304,12 @@
                             </div>
                             
                             <!-- EFT Reference Number Input -->
-                            <div class="input-group" id="eftReferenceGroup" style="display: none;">
+                            <div class="input-group" id="eftReferenceGroupLegacy" style="display: none;">
                                 <label for="eftReferenceDisplay">EFT Reference Number *</label>
-                                <input type="text" id="eftReferenceDisplay" name="eftReference" placeholder="Enter your EFT reference number" required>
+                                <input type="text" id="eftReferenceDisplayLegacy" name="eftReference" placeholder="Enter your EFT reference number" required>
                                 <small class="hint">Enter the reference number from your bank transfer, click I've made the transfer button below, scroll up & fill the registration form above then submit your details</small>
                             </div>
                             
-                            <button type="button" class="cta bank-confirm-btn" id="confirmBankTransfer" style="display: none; margin-top: 1rem;">
-                                I've Made the Transfer
-                            </button>
                         </div>
                     </div>
                 </div>
@@ -279,7 +334,6 @@
             
             // Get all necessary DOM elements
             const paymentCards = document.querySelectorAll('.payment-card');
-            const selectBankTransfer = document.getElementById('selectBankTransfer');
             const bankDetailsPanel = document.getElementById('bankDetailsPanel');
             const eftReferenceGroup = document.getElementById('eftReferenceGroup');
             const confirmBankTransfer = document.getElementById('confirmBankTransfer');
@@ -291,16 +345,48 @@
                 return;
             }
             
-            // Handle bank transfer selection
-            selectBankTransfer.addEventListener('click', function(e) {
-                e.preventDefault();
-                bankDetailsPanel.style.display = 'block';
-                this.style.display = 'none';
-                // Show the EFT reference input after a short delay
-                setTimeout(() => {
+            // Bank transfer is now driven by selecting the EFT radio (see updatePaymentUI below)
+
+            // Sync radio when clicking payment option cards
+            document.querySelectorAll('.payment-card .select-payment').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const method = btn.closest('.payment-card')?.getAttribute('data-payment-method');
+                    const radio = method ? document.querySelector(`input[name="paymentMethod"][value="${method}"]`) : null;
+                    if (radio) radio.checked = true;
+                    if (method) updatePaymentUI(method);
+                });
+            });
+
+            // Toggle EFT UI when payment method radios change
+            function updatePaymentUI(method) {
+                const eftRefInput = document.getElementById('eftReferenceDisplay');
+                const hiddenRefInput = document.getElementById('eftReference');
+                if (method === 'eft') {
+                    bankDetailsPanel.style.display = 'block';
                     eftReferenceGroup.style.display = 'block';
                     confirmBankTransfer.style.display = 'block';
-                }, 300);
+                    if (eftRefInput) eftRefInput.required = true;
+                    // Ensure visibility and focus when switching to EFT
+                    bankDetailsPanel.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    setTimeout(() => { if (eftRefInput) eftRefInput.focus(); }, 200);
+                } else {
+                    // Hide EFT-specific UI and clear state
+                    eftReferenceGroup.style.display = 'none';
+                    confirmBankTransfer.style.display = 'none';
+                    // Keep the outer panel hidden unless user explicitly opened it
+                    bankDetailsPanel.style.display = 'none';
+                    if (eftRefInput) {
+                        eftRefInput.required = false;
+                        eftRefInput.value = '';
+                    }
+                    if (hiddenRefInput) hiddenRefInput.value = '';
+                }
+            }
+
+            document.querySelectorAll('input[name="paymentMethod"]').forEach(r => {
+                r.addEventListener('change', (e) => {
+                    updatePaymentUI(e.target.value);
+                });
             });
             
             // Handle bank transfer confirmation
@@ -367,7 +453,7 @@
                         country: formData.get('country'),
                         dietary: formData.get('dietary'),
                         eftReference: formData.get('eftReference') || 'Not provided',
-                        paymentMethod: 'Bank Transfer',
+                        paymentMethod: formData.get('paymentMethod') || 'eft',
                         submissionTime: new Date().toISOString()
                     };
                     
@@ -420,7 +506,7 @@
                         country: formData.get('country'),
                         dietary: formData.get('dietary'),
                         eftReference: formData.get('eftReference') || 'Not provided',
-                        paymentMethod: 'Bank Transfer',
+                        paymentMethod: formData.get('paymentMethod') || 'eft',
                         status: 'pending',
                         submissionTime: new Date().toISOString(),
                         createdAt: serverTimestamp(),

@@ -312,7 +312,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 submitBtn.style.cursor = 'not-allowed';
             }
             
-            if (!paymentApproved) {
+            const fd = new FormData(formEl);
+            const selectedPaymentMethod = (fd.get('paymentMethod') || '').toLowerCase();
+
+            // For EFT, allow submit without online payment approval
+            const requiresOnlinePayment = selectedPaymentMethod !== 'eft';
+            if (requiresOnlinePayment && !paymentApproved) {
                 if (window.Swal) {
                     await Swal.fire({
                         icon: 'info',
@@ -325,7 +330,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
             
-            const fd = new FormData(formEl);
             const formData = Object.fromEntries(fd.entries());
             const submitText = submitBtn ? submitBtn.textContent : 'Submit';
             
@@ -346,19 +350,32 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                 });
             }
-
             try {
                 // Write to Firebase Firestore
                 if (window.db) {
                     const { addDoc, collection } = await import('firebase/firestore');
-                    await addDoc(collection(window.db, 'registrations'), {
+                    // Normalize payment method display label
+                    const paymentLabel = selectedPaymentMethod === 'paypal' ? 'PayPal'
+                        : selectedPaymentMethod === 'payfast' ? 'PayFast'
+                        : 'EFT';
+                    const nowIso = new Date().toISOString();
+
+                    // Determine payment status and fields
+                    const paymentDoc = {
                         ...formData,
-                        paymentStatus: 'completed',
-                        paymentMethod: 'PayPal',
-                        paymentAmount: '20.00',
-                        paymentDate: new Date().toISOString(),
-                        createdAt: new Date().toISOString()
-                    });
+                        paymentMethod: paymentLabel,
+                        paymentDate: nowIso,
+                        createdAt: nowIso
+                    };
+
+                    if (selectedPaymentMethod === 'eft') {
+                        paymentDoc.paymentStatus = 'pending';
+                    } else {
+                        paymentDoc.paymentStatus = 'completed';
+                        paymentDoc.paymentAmount = '20.00';
+                    }
+
+                    await addDoc(collection(window.db, 'registrations'), paymentDoc);
                 }
 
                 // Send to Formspree
