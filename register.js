@@ -151,7 +151,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.log('Sending createOrder request...');
                 
                 const result = await createOrder({ 
-                    amount: '1.00', 
+                    amount: '20.00', 
                     currency: 'USD' 
                 });
                 
@@ -184,27 +184,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // PayFast integration (redirect flow)
     if (payfastBtn) {
-        payfastBtn.addEventListener('click', async () => {
-            try {
-                const buyer = {
-                    firstName: document.getElementById('firstName')?.value || '',
-                    lastName: document.getElementById('lastName')?.value || '',
-                    email: document.getElementById('email')?.value || ''
-                };
-                const res = await fetch('/.netlify/functions/payfast-create', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ amount: '1.00', buyer })
-                });
-                const data = await res.json();
-                if (data && data.redirect) {
-                    window.location.href = data.redirect;
-                }
-            } catch (err) {
-                console.error('PayFast create error', err);
-            }
-        });
-    }
+        
+        }
 
     // Guard form submission: require payment first
     if (formEl) {
