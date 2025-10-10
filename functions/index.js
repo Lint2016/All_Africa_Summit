@@ -41,12 +41,12 @@ exports.createOrder = functions.https.onCall(async (data) => {
       throw new Error("No data provided");
     }
 
-    const amount = String(data.amount || "20.00").trim();
+    const amount = String(data.amount || "200.00").trim();
     const currency = String(data.currency || "USD").toUpperCase().trim();
 
     // Validate amount format (should be a valid number with up to 2 decimal places)
     if (!/^\d+(\.\d{1,2})?$/.test(amount)) {
-      throw new Error("Invalid amount format. Use format: \"20.00\"");
+      throw new Error("Invalid amount format. Use format: \"200.00\"");
     }
 
     const request = new paypal.orders.OrdersCreateRequest();
