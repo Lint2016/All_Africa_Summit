@@ -61,6 +61,10 @@ exports.createOrder = functions.https.onCall(async (data) => {
           },
         },
       ],
+      application_context: {
+        return_url: "http://127.0.0.1:5500/register.html?success=true",
+        cancel_url: "http://127.0.0.1:5500/register.html?success=false",
+      },
     });
 
     const order = await client().execute(request);

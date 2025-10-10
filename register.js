@@ -180,6 +180,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     swalInstance.close();
                 }
             });
+            
         }
     })();
 
