@@ -8,6 +8,10 @@ import {
   doc,
   getDoc
 } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js';
+import {
+  getFunctions,
+  httpsCallable
+} from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-functions.js';
 import { 
   getAuth,
   onAuthStateChanged,
@@ -31,6 +35,7 @@ const firebaseConfig = {
 let app;
 let db;
 let auth;
+let functions;
 let isInitialized = false;
 
 // ✅ Function to initialize Firebase
@@ -50,16 +55,22 @@ export async function initializeFirebase() {
     // Initialize services
     db = getFirestore(app);
     auth = getAuth(app);
+    functions = getFunctions(app);
     
-    // Make auth methods available globally
+    // Make services/methods available globally
     window.firebase = window.firebase || {};
+    window.firebase.app = app;
+    window.firebase.db = db;
     window.firebase.auth = auth;
     window.firebase.signInWithEmailAndPassword = signInWithEmailAndPassword;
     window.firebase.createUserWithEmailAndPassword = createUserWithEmailAndPassword;
     window.firebase.signOut = signOut;
 
-    // Make available globally for debugging
-    window.firebase = { app, db, auth };
+    // Expose functions and a namespaced-compatible httpsCallable helper
+    window.functions = functions;
+    window.functions.httpsCallable = (name) => httpsCallable(functions, name);
+
+    // Also expose on window for convenience
     window.db = db;
     window.auth = auth;
 

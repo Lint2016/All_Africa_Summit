@@ -9,16 +9,14 @@ const firebaseConfig = {
   measurementId: "G-YWLCPLNLPZ"
 };
 
-// Initialize Firebase
-let app;
-let functions;
+// Initialize Firebase references from global (initialized in firebase-init.js)
+let app = window.firebase && window.firebase.app;
+let functions = window.functions;
 
-try {
-  app = firebase.initializeApp(firebaseConfig);
-  functions = firebase.functions();
-  console.log('Firebase initialized successfully');
-} catch (error) {
-  console.error('Firebase initialization error:', error);
+if (app) {
+  console.log('Firebase app reference available');
+} else {
+  console.warn('Firebase app not yet initialized. Ensure `firebase-init.js` is loaded as a module.');
 }
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -353,7 +351,7 @@ document.addEventListener('DOMContentLoaded', function() {
             try {
                 // Write to Firebase Firestore
                 if (window.db) {
-                    const { addDoc, collection } = await import('firebase/firestore');
+                    const { addDoc, collection } = await import('https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js');
                     // Normalize payment method display label
                     const paymentLabel = selectedPaymentMethod === 'paypal' ? 'PayPal'
                         : selectedPaymentMethod === 'payfast' ? 'PayFast'
@@ -438,83 +436,5 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Style form elements
-    const style = document.createElement('style');
-    style.textContent = `
-        #registrationForm label {
-            margin: 10px 0 5px;
-            font-weight: bold;
-            color: #333;
-            display: block;
-        }
-
-        #registrationForm input,
-        #registrationForm select {
-            padding: 10px;
-            margin-bottom: 15px;
-            border-radius: 6px;
-            border: 1px solid #ccc;
-            font-size: 1rem;
-            width: 100%;
-        }
-
-        #registrationForm button[type="submit"] {
-            background: #b25538;
-            color: #fff;
-            border: none;
-            border-radius: 6px;
-            padding: 12px;
-            cursor: pointer;
-            font-size: 1rem;
-            width: 100%;
-            transition: background 0.3s ease;
-        }
-
-        #registrationForm button[type="submit"]:hover {
-            background: #9a472f;
-        }
-
-        #registrationForm button[type="submit"]:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            pointer-events: none;
-        }
-
-        .help-link {
-            display: block;
-            font-size: 0.9rem;
-            color: #0070ba;
-            text-decoration: none;
-        }
-
-        .help-link:hover {
-            text-decoration: underline;
-        }
-
-        .bank-details {
-            margin-top: 1rem;
-            text-align: left;
-            font-size: 0.95rem;
-            color: #333;
-            background: #f9f9f9;
-            padding: 1rem;
-            border-radius: 0.5rem;
-            border: 1px solid #ddd;
-        }
-
-        .bank-details p {
-            margin-bottom: 8px;
-            line-height: 1.4;
-        }
-
-        .payment-card.bank-transfer {
-            border: 2px solid #007bff;
-        }
-
-        .payment-card.bank-transfer:hover {
-            border-color: #0056b3;
-            background-color: #f8f9ff;
-        }
-    `;
-    document.head.appendChild(style);
-});
+    // Styles moved to `register.css` and loaded in the HTML head for faster paint
+  });
