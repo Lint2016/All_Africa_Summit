@@ -39,13 +39,13 @@ exports.createOrder = functions.https.onCall(async (data) => {
   try {
     if (!data) throw new Error("No data provided");
 
-    const amount = String(data.amount || "200.00").trim();
+    const amount = String(data.amount || "120.00").trim();
     const currency = String(data.currency || "USD").toUpperCase().trim();
     const returnUrl = data.returnUrl ? String(data.returnUrl).trim() : "";
     const cancelUrl = data.cancelUrl ? String(data.cancelUrl).trim() : "";
 
     if (!/^\d+(\.\d{1,2})?$/.test(amount)) {
-      throw new Error("Invalid amount format. Use format: \"200.00\"");
+      throw new Error("Invalid amount format. Use format: \"120.00\"");
     }
 
     // Create the simplest possible order

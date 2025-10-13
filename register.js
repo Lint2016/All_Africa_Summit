@@ -219,7 +219,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 const currentUrl = window.location.href.split('?')[0];
                 const result = await createOrder({ 
-                    amount: '20.00', 
+                    amount: '120.00', 
                     currency: 'USD',
                     returnUrl: `${currentUrl}?paypal=return`,
                     cancelUrl: `${currentUrl}?paypal=cancel`
@@ -247,7 +247,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         if (window.Swal) {
                             const { isConfirmed } = await Swal.fire({
                                 title: 'Redirecting to PayPal',
-                                text: 'You will be redirected to PayPal to complete your payment of $20.00',
+                                text: 'You will be redirected to PayPal to complete your payment of $120.00',
                                 icon: 'info',
                                 showCancelButton: true,
                                 confirmButtonColor: '#b25538',
@@ -370,7 +370,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         paymentDoc.paymentStatus = 'pending';
                     } else {
                         paymentDoc.paymentStatus = 'completed';
-                        paymentDoc.paymentAmount = '20.00';
+                        paymentDoc.paymentAmount = '120.00';
                     }
 
                     await addDoc(collection(window.db, 'registrations'), paymentDoc);
