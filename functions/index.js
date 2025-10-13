@@ -70,7 +70,7 @@ exports.createOrder = functions.https.onCall(async (data) => {
         return_url: returnUrl,
         cancel_url: cancelUrl,
         brand_name: "All Africa Apostolic Summit",
-        landing_page: "LOGIN",
+        landing_page: "GUEST_CHECKOUT",
         user_action: "PAY_NOW",
       };
     }
