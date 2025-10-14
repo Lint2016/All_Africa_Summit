@@ -43,7 +43,7 @@ exports.createOrder = functions.https.onCall(async (data) => {
   try {
     if (!data) throw new Error("No data provided");
 
-    const amount = String(data.amount || "0.50").trim();
+    const amount = String(data.amount || "1.00").trim();
     const currency = String(data.currency || "USD").toUpperCase().trim();
     const returnUrl = data.returnUrl ? String(data.returnUrl).trim() : "";
     const cancelUrl = data.cancelUrl ? String(data.cancelUrl).trim() : "";
