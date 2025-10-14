@@ -331,7 +331,8 @@ document.addEventListener('DOMContentLoaded', function() {
                         (async () => {
                             try {
                                 // Reference is saved in hidden input and will be used by webhook reconciliation
-                                await markPaid(true);
+                                // Prevent markPaid from showing its own alert to avoid double popups
+                                await markPaid(false);
                                 if (window.Swal) {
                                     await Swal.fire({
                                         icon: 'success',
