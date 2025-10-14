@@ -2,6 +2,7 @@ require("dotenv").config(); // Load .env file
 const functions = require("firebase-functions");
 const paypal = require("@paypal/checkout-server-sdk");
 const admin = require("firebase-admin");
+const crypto = require("crypto");
 if (!admin.apps.length) {
   admin.initializeApp();
 }
@@ -114,6 +115,82 @@ exports.createOrder = functions.https.onCall(async (data) => {
     }
     console.error("PayPal createOrder error:", err);
     throw new functions.https.HttpsError("internal", err.message);
+  }
+});
+
+// Paystack webhook: verify signature and update Firestore on charge.success
+exports.paystackWebhook = functions.https.onRequest(async (req, res) => {
+  try {
+    if (req.method !== "POST") {
+      res.status(405).send("Method Not Allowed");
+      return;
+    }
+
+    const secret = process.env.PAYSTACK_SECRET_KEY || "";
+    if (!secret) {
+      res.status(500).send("PAYSTACK_SECRET_KEY not configured");
+      return;
+    }
+
+    const signature = req.header("x-paystack-signature");
+    if (!signature) {
+      res.status(400).send("Missing signature");
+      return;
+    }
+
+    // Compute HMAC SHA512 of raw body
+    const computed = crypto.createHmac("sha512", secret)
+        .update(req.rawBody)
+        .digest("hex");
+
+    if (computed !== signature) {
+      res.status(400).send("Invalid signature");
+      return;
+    }
+
+    const event = req.body && req.body.event;
+    const data = (req.body && req.body.data) || {};
+
+    if (event === "charge.success") {
+      const reference = data.reference || "";
+      const amount = typeof data.amount === "number" ? data.amount : 0; // in minor units
+      const currency = data.currency || "";
+      const email = data.customer && data.customer.email ? data.customer.email : "";
+
+      if (reference) {
+        const db = admin.firestore();
+        const q = await db
+            .collection("registrations")
+            .where("paystackRef", "==", reference)
+            .limit(1)
+            .get();
+
+        if (!q.empty) {
+          const doc = q.docs[0];
+          const docRef = doc.ref;
+          const current = doc.data() || {};
+          const alreadyCompleted = (current.paymentStatus || "").toLowerCase() === "completed";
+          if (!alreadyCompleted) {
+            await docRef.set(
+                {
+                  paymentStatus: "completed",
+                  paymentAmount: (amount / 100).toFixed(2),
+                  currency: currency,
+                  paystackReference: reference,
+                  payerEmail: email,
+                  updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+                },
+                {merge: true},
+            );
+          }
+        }
+      }
+    }
+
+    res.status(200).send("OK");
+  } catch (e) {
+    console.error("paystackWebhook error:", e);
+    res.status(500).send("Server error");
   }
 });
 

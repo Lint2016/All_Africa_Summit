@@ -316,18 +316,25 @@ document.addEventListener('DOMContentLoaded', function() {
                     return;
                 }
 
+                // Generate a stable reference for this attempt and store it in hidden input
+                const reference = 'AAAS-' + Date.now();
+                const paystackHiddenRef = document.getElementById('paystackRef');
+                if (paystackHiddenRef) paystackHiddenRef.value = reference;
+
                 const handler = window.PaystackPop.setup({
                     key: 'pk_test_ff6534df79e2f4a5b6a2c89cc7d63f0c1dae181f',
                     email,
                     amount: Math.round(0.50 * 100), // amount in cents/kobo
                     currency: 'ZAR',
-                    ref: 'AAAS-' + Date.now(),
+                    ref: reference,
                     callback: function(response) {
                         (async () => {
                             try {
                                 const verifyPaystack = functions && functions.httpsCallable ? functions.httpsCallable('verifyPaystack') : null;
                                 if (!verifyPaystack) throw new Error('Verification function not available');
-                                const res = await verifyPaystack({ reference: response.reference });
+                                const hiddenRef = (document.getElementById('paystackRef') && document.getElementById('paystackRef').value) || '';
+                                const refToVerify = (response && (response.reference || response.trxref)) || hiddenRef || reference;
+                                const res = await verifyPaystack({ reference: refToVerify });
                                 const data = res && res.data ? res.data : res;
                                 if (data && (data.ok || (data.data && data.data.status === 'success'))) {
                                     await markPaid(true);
@@ -335,8 +342,8 @@ document.addEventListener('DOMContentLoaded', function() {
                                     await Swal.fire({ icon: 'error', title: 'Verification failed', text: 'We could not verify your Paystack payment.', confirmButtonColor: '#b25538' });
                                 }
                             } catch (e) {
-                                console.error('Paystack verify error:', e);
-                                await Swal.fire({ icon: 'error', title: 'Verification error', text: e.message || 'Unknown error', confirmButtonColor: '#b25538' });
+                               // console.error('Paystack verify error:', e);
+                              //  await Swal.fire({ icon: 'error', title: 'Verification error', text: e.message || 'Unknown error', confirmButtonColor: '#b25538' });
                             }
                         })();
                     },
