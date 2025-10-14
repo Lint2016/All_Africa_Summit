@@ -43,7 +43,7 @@ exports.createOrder = functions.https.onCall(async (data) => {
   try {
     if (!data) throw new Error("No data provided");
 
-    const amount = String(data.amount || "1.00").trim();
+    const amount = String(data.amount || "0.50").trim();
     const currency = String(data.currency || "USD").toUpperCase().trim();
     const returnUrl = data.returnUrl ? String(data.returnUrl).trim() : "";
     const cancelUrl = data.cancelUrl ? String(data.cancelUrl).trim() : "";
@@ -114,6 +114,43 @@ exports.createOrder = functions.https.onCall(async (data) => {
     }
     console.error("PayPal createOrder error:", err);
     throw new functions.https.HttpsError("internal", err.message);
+  }
+});
+
+// Verify Paystack transaction
+exports.verifyPaystack = functions.https.onCall(async (data) => {
+  try {
+    if (!data || !data.reference) {
+      throw new functions.https.HttpsError("invalid-argument", "Missing reference");
+    }
+
+    const secret = process.env.PAYSTACK_SECRET_KEY || "";
+    if (!secret) {
+      // eslint-disable-next-line max-len
+      throw new functions.https.HttpsError("failed-precondition", "PAYSTACK_SECRET_KEY not configured");
+    }
+
+    // eslint-disable-next-line max-len
+    const resp = await fetch(`https://api.paystack.co/transaction/verify/${encodeURIComponent(data.reference)}`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${secret}`,
+        Accept: "application/json",
+      },
+    });
+
+    const json = await resp.json().catch(() => ({}));
+    if (!resp.ok) {
+      const msg = (json && json.message) ? json.message : "Paystack verify failed";
+      throw new functions.https.HttpsError("internal", msg);
+    }
+
+    const status = json && json.data ? json.data.status : "";
+    return {ok: status === "success", data: json.data || null};
+  } catch (err) {
+    console.error("verifyPaystack error:", err);
+    if (err instanceof functions.https.HttpsError) throw err;
+    throw new functions.https.HttpsError("internal", err.message || "Unknown error");
   }
 });
 

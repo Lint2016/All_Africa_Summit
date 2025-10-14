@@ -219,7 +219,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 const currentUrl = window.location.href.split('?')[0];
                 const result = await createOrder({ 
-                    amount: '1.00', 
+                    amount: '0.50', 
                     currency: 'USD',
                     returnUrl: `${currentUrl}?paypal=return`,
                     cancelUrl: `${currentUrl}?paypal=cancel`
@@ -294,10 +294,58 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // PayFast integration (redirect flow)
-    if (payfastBtn) {
-        
-        }
+    // Paystack integration (inline)
+    (function initPaystack() {
+        const paystackBtnEl = document.querySelector('.payment-card.paystack .select-payment');
+        if (!paystackBtnEl) return;
+        paystackBtnEl.addEventListener('click', async () => {
+            try {
+                const formEl = document.getElementById('registrationForm');
+                if (!formEl) throw new Error('Form not found');
+
+                // Read email and build amount (in smallest unit)
+                const fd = new FormData(formEl);
+                const email = (fd.get('email') || '').toString().trim();
+                if (!email) {
+                    await Swal.fire({ icon: 'info', title: 'Email required', text: 'Please fill your email before paying.', confirmButtonColor: '#b25538' });
+                    return;
+                }
+
+                const handler = window.PaystackPop && window.PaystackPop.setup({
+                    key: 'pk_test_ff6534df79e2f4a5b6a2c89cc7d63f0c1dae181f',
+                    email,
+                    amount: Math.round(0.50 * 100), // amount in cents/kobo
+                    currency: 'USD',
+                    ref: 'AAAS-' + Date.now(),
+                    callback: async (response) => {
+                        try {
+                            const verifyPaystack = functions && functions.httpsCallable ? functions.httpsCallable('verifyPaystack') : null;
+                            if (!verifyPaystack) throw new Error('Verification function not available');
+                            const res = await verifyPaystack({ reference: response.reference });
+                            const data = res && res.data ? res.data : res;
+                            if (data && (data.ok || (data.data && data.data.status === 'success'))) {
+                                await markPaid(true);
+                            } else {
+                                await Swal.fire({ icon: 'error', title: 'Verification failed', text: 'We could not verify your Paystack payment.', confirmButtonColor: '#b25538' });
+                            }
+                        } catch (e) {
+                            console.error('Paystack verify error:', e);
+                            await Swal.fire({ icon: 'error', title: 'Verification error', text: e.message || 'Unknown error', confirmButtonColor: '#b25538' });
+                        }
+                    },
+                    onClose: function () {
+                        // User closed the modal
+                    }
+                });
+                if (handler) handler.openIframe();
+            } catch (err) {
+                console.error('Paystack init error:', err);
+                if (window.Swal) {
+                    await Swal.fire({ icon: 'error', title: 'Payment Error', text: err.message || 'Unable to start Paystack checkout', confirmButtonColor: '#b25538' });
+                }
+            }
+        });
+    })();
 
     // Guard form submission: require payment first
     if (formEl) {

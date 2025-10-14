@@ -24,6 +24,8 @@
     <!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-functions-compat.js"></script>
+    <!--PayStack inline script-->
+<script src="https://js.paystack.co/v1/inline.js"></script>
 
     <title>Register - All Africa Apostolic Summit 2026</title>
     <style>
@@ -193,6 +195,10 @@
                           <input type="radio" name="paymentMethod" value="paypal">
                           PayPal
                         </label>
+                        <label style="display: inline-flex; align-items: center; margin-right: 1rem; gap: 0.4rem;">
+                          <input type="radio" name="paymentMethod" value="paystack">
+                          Paystack
+                        </label>
                         <label style="display: inline-flex; align-items: center; gap: 0.4rem;">
                           <input type="radio" name="paymentMethod" value="payfast">
                           PayFast
@@ -237,7 +243,7 @@
                         </div>
                         
                         <button type="button" class="cta bank-confirm-btn" id="confirmBankTransfer" style="display: none; margin-top: 1rem;">
-                            EFT Ref is required
+                            I've made an EFT
                         </button>
                     </div>
 
@@ -253,14 +259,7 @@
                         <p>Pay securely with PayPal</p>
                         <button type="button" class="cta paypal-btn select-payment">Pay with PayPal</button>
                     </div>
-
-                    <!-- PayFast Option -->
-                    <div class="payment-card payfast" data-payment-method="payfast">
-                        <img src="images/payfast-logo.png" alt="PayFast Logo">
-                        <p>Pay securely with PayFast</p>
-                        <button type="button" class="cta payfast-btn select-payment">Pay with PayFast</button>
-                    </div>
-
+                    
                      <!-- PayStack Option -->
                     <div class="payment-card paystack" data-payment-method="paystack">
                         <img src="images/Paystack-mark-white-twitter.png" alt="PayStack Logo">
@@ -309,7 +308,7 @@
                             <div class="input-group" id="eftReferenceGroupLegacy" style="display: none;">
                                 <label for="eftReferenceDisplay">EFT Reference Number *</label>
                                 <input type="text" id="eftReferenceDisplayLegacy" name="eftReference" placeholder="Enter your EFT reference number" required>
-                                <small class="hint">Enter the reference number from your bank transfer, click I've made the transfer button below, scroll up & fill the registration form above then submit your details</small>
+                                <small class="hint">Enter the reference number from your bank transfer, click I've made an EFT button below, scroll up & fill the registration form above then submit your details</small>
                             </div>
                             
                         </div>
@@ -699,6 +698,7 @@
             }
         });
     </script>
+    <script src="https://js.paystack.co/v1/inline.js"></script>
     
     <!-- Footer -->
     <footer class="footer">
