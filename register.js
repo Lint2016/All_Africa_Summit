@@ -219,7 +219,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 const currentUrl = window.location.href.split('?')[0];
                 const result = await createOrder({ 
-                    amount: '120.00', 
+                    amount: '0.50', 
                     currency: 'USD',
                     returnUrl: `${currentUrl}?paypal=return`,
                     cancelUrl: `${currentUrl}?paypal=cancel`

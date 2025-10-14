@@ -1,6 +1,10 @@
 require("dotenv").config(); // Load .env file
 const functions = require("firebase-functions");
 const paypal = require("@paypal/checkout-server-sdk");
+const admin = require("firebase-admin");
+if (!admin.apps.length) {
+  admin.initializeApp();
+}
 
 // PayPal environment setup
 function environment() {
@@ -26,7 +30,7 @@ function environment() {
     throw new Error("PayPal credentials not configured. Please set PAYPAL_CLIENT_ID and PAYPAL_CLIENT_SECRET environment variables.");
   }
 
-  return new paypal.core.SandboxEnvironment(clientId, clientSecret);
+  return new paypal.core.LiveEnvironment(clientId, clientSecret);
 }
 
 function client() {
@@ -39,7 +43,7 @@ exports.createOrder = functions.https.onCall(async (data) => {
   try {
     if (!data) throw new Error("No data provided");
 
-    const amount = String(data.amount || "120.00").trim();
+    const amount = String(data.amount || "0.50").trim();
     const currency = String(data.currency || "USD").toUpperCase().trim();
     const returnUrl = data.returnUrl ? String(data.returnUrl).trim() : "";
     const cancelUrl = data.cancelUrl ? String(data.cancelUrl).trim() : "";
@@ -61,6 +65,7 @@ exports.createOrder = functions.https.onCall(async (data) => {
             currency_code: currency,
             value: amount,
           },
+          ...(data && data.customId ? {custom_id: String(data.customId).slice(0, 127)} : {}),
         },
       ],
     };
@@ -109,6 +114,87 @@ exports.createOrder = functions.https.onCall(async (data) => {
     }
     console.error("PayPal createOrder error:", err);
     throw new functions.https.HttpsError("internal", err.message);
+  }
+});
+
+exports.paypalWebhook = functions.https.onRequest(async (req, res) => {
+  try {
+    if (req.method !== "POST") {
+      res.status(405).send("Method Not Allowed");
+      return;
+    }
+
+    const webhookId = process.env.PAYPAL_WEBHOOK_ID || "";
+    if (!webhookId) {
+      res.status(500).send("Webhook ID not configured");
+      return;
+    }
+
+    const transmissionId = req.header("paypal-transmission-id");
+    const transmissionTime = req.header("paypal-transmission-time");
+    const certUrl = req.header("paypal-cert-url");
+    const authAlgo = req.header("paypal-auth-algo");
+    const transmissionSig = req.header("paypal-transmission-sig");
+    const body = req.body;
+
+    const clientId = process.env.PAYPAL_CLIENT_ID || "";
+    const clientSecret = process.env.PAYPAL_CLIENT_SECRET || "";
+    if (!clientId || !clientSecret) {
+      res.status(500).send("Credentials not configured");
+      return;
+    }
+
+    const base = "https://api-m.paypal.com";
+    const tokenResp = await fetch(`${base}/v1/oauth2/token`, {
+      method: "POST",
+      headers: {
+        "Authorization": "Basic " + Buffer.from(`${clientId}:${clientSecret}`).toString("base64"),
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: "grant_type=client_credentials",
+    });
+    if (!tokenResp.ok) {
+      res.status(500).send("Failed to get access token");
+      return;
+    }
+    const tokenJson = await tokenResp.json();
+    const accessToken = tokenJson.access_token;
+
+    const verifyResp = await fetch(`${base}/v1/notifications/verify-webhook-signature`, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        auth_algo: authAlgo,
+        cert_url: certUrl,
+        transmission_id: transmissionId,
+        transmission_sig: transmissionSig,
+        transmission_time: transmissionTime,
+        webhook_id: webhookId,
+        webhook_event: body,
+      }),
+    });
+
+    if (!verifyResp.ok) {
+      res.status(400).send("Verification request failed");
+      return;
+    }
+    const verifyJson = await verifyResp.json();
+    if (verifyJson.verification_status !== "SUCCESS") {
+      res.status(400).send("Invalid signature");
+      return;
+    }
+
+    const eventType = body && body.event_type;
+    if (eventType === "PAYMENT.CAPTURE.COMPLETED") {
+      // Placeholder for updating Firestore if needed
+    }
+
+    res.status(200).send("OK");
+  } catch (e) {
+    res.status(500).send("Server error");
   }
 });
 
