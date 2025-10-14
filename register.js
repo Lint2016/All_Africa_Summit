@@ -311,27 +311,34 @@ document.addEventListener('DOMContentLoaded', function() {
                     return;
                 }
 
-                const handler = window.PaystackPop && window.PaystackPop.setup({
+                if (!window.PaystackPop || !window.PaystackPop.setup) {
+                    await Swal.fire({ icon: 'info', title: 'Payment not ready', text: 'Please wait a moment and try again.', confirmButtonColor: '#b25538' });
+                    return;
+                }
+
+                const handler = window.PaystackPop.setup({
                     key: 'pk_test_ff6534df79e2f4a5b6a2c89cc7d63f0c1dae181f',
                     email,
                     amount: Math.round(0.50 * 100), // amount in cents/kobo
-                    currency: 'USD',
+                    currency: 'ZAR',
                     ref: 'AAAS-' + Date.now(),
-                    callback: async (response) => {
-                        try {
-                            const verifyPaystack = functions && functions.httpsCallable ? functions.httpsCallable('verifyPaystack') : null;
-                            if (!verifyPaystack) throw new Error('Verification function not available');
-                            const res = await verifyPaystack({ reference: response.reference });
-                            const data = res && res.data ? res.data : res;
-                            if (data && (data.ok || (data.data && data.data.status === 'success'))) {
-                                await markPaid(true);
-                            } else {
-                                await Swal.fire({ icon: 'error', title: 'Verification failed', text: 'We could not verify your Paystack payment.', confirmButtonColor: '#b25538' });
+                    callback: function(response) {
+                        (async () => {
+                            try {
+                                const verifyPaystack = functions && functions.httpsCallable ? functions.httpsCallable('verifyPaystack') : null;
+                                if (!verifyPaystack) throw new Error('Verification function not available');
+                                const res = await verifyPaystack({ reference: response.reference });
+                                const data = res && res.data ? res.data : res;
+                                if (data && (data.ok || (data.data && data.data.status === 'success'))) {
+                                    await markPaid(true);
+                                } else {
+                                    await Swal.fire({ icon: 'error', title: 'Verification failed', text: 'We could not verify your Paystack payment.', confirmButtonColor: '#b25538' });
+                                }
+                            } catch (e) {
+                                console.error('Paystack verify error:', e);
+                                await Swal.fire({ icon: 'error', title: 'Verification error', text: e.message || 'Unknown error', confirmButtonColor: '#b25538' });
                             }
-                        } catch (e) {
-                            console.error('Paystack verify error:', e);
-                            await Swal.fire({ icon: 'error', title: 'Verification error', text: e.message || 'Unknown error', confirmButtonColor: '#b25538' });
-                        }
+                        })();
                     },
                     onClose: function () {
                         // User closed the modal
