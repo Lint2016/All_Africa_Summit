@@ -204,6 +204,31 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
+
+    // GA4: Enter Site modal button click
+    const enterBtn = document.getElementById('enterButton');
+    if (enterBtn) {
+        enterBtn.addEventListener('click', () => {
+            if (window.safeLogEvent) {
+                window.safeLogEvent('enter_site_click', {
+                    page_location: window.location.href
+                });
+            }
+        });
+    }
+
+    // GA4: Register Now CTA click
+    const registerNow = document.querySelector('a.btn.btn-primary[href="register.html"]');
+    if (registerNow) {
+        registerNow.addEventListener('click', () => {
+            if (window.safeLogEvent) {
+                window.safeLogEvent('register_now_click', {
+                    page_location: window.location.href,
+                    link_url: registerNow.href
+                });
+            }
+        });
+    }
 });
 
 // Payment functionality moved to register.html page

@@ -12,6 +12,7 @@ import {
   getFunctions,
   httpsCallable
 } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-functions.js';
+import { getAnalytics, logEvent } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-analytics.js';
 import { 
   getAuth,
   onAuthStateChanged,
@@ -37,6 +38,7 @@ let db;
 let auth;
 let functions;
 let isInitialized = false;
+let analytics = null;
 
 // ✅ Function to initialize Firebase
 export async function initializeFirebase() {
@@ -56,6 +58,7 @@ export async function initializeFirebase() {
     db = getFirestore(app);
     auth = getAuth(app);
     functions = getFunctions(app);
+    try { analytics = getAnalytics(app); } catch (e) { console.warn('Analytics not available in this environment:', e); }
     
     // Make services/methods available globally
     window.firebase = window.firebase || {};
@@ -69,6 +72,12 @@ export async function initializeFirebase() {
     // Expose functions and a namespaced-compatible httpsCallable helper
     window.functions = functions;
     window.functions.httpsCallable = (name) => httpsCallable(functions, name);
+
+    // Expose analytics and a safe logEvent helper
+    window.analytics = analytics;
+    window.safeLogEvent = (name, params = {}) => {
+      try { if (analytics) logEvent(analytics, name, params); } catch (_) {}
+    };
 
     // Also expose on window for convenience
     window.db = db;

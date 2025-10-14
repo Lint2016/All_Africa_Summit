@@ -24,6 +24,7 @@
     <!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-functions-compat.js"></script>
+
     <title>Register - All Africa Apostolic Summit 2026</title>
     <style>
         /* Submit button styles */
@@ -346,6 +347,19 @@
                 return;
             }
             
+            // GA4: log registration submit button click
+            if (submitBtn) {
+                submitBtn.addEventListener('click', () => {
+                    if (window.safeLogEvent) {
+                        const method = document.querySelector('input[name="paymentMethod"]:checked')?.value || 'unknown';
+                        window.safeLogEvent('registration_submit_click', {
+                            payment_method: method,
+                            page_location: window.location.href
+                        });
+                    }
+                });
+            }
+            
             // Bank transfer is now driven by selecting the EFT radio (see updatePaymentUI below)
 
             // Sync radio when clicking payment option cards
@@ -490,6 +504,16 @@
                 const originalBtnText = submitBtn.innerHTML;
                 submitBtn.disabled = true;
                 submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Submitting...';
+                // GA4: registration submit attempt
+                if (window.safeLogEvent) {
+                    try {
+                        const pm = (document.querySelector('input[name="paymentMethod"]:checked')?.value) || 'eft';
+                        window.safeLogEvent('registration_submit_attempt', {
+                            payment_method: pm,
+                            page_location: window.location.href
+                        });
+                    } catch (_) {}
+                }
                 
                 try {
                     // Get client IP address
@@ -584,6 +608,15 @@
                             confirmButton: 'sweet-alert-confirm'
                         }
                     });
+                    // GA4: registration submit success
+                    if (window.safeLogEvent) {
+                        try {
+                            window.safeLogEvent('registration_submit_success', {
+                                payment_method: formObject.paymentMethod,
+                                page_location: window.location.href
+                            });
+                        } catch (_) {}
+                    }
                     
                     registrationForm.reset();
                     submitBtn.disabled = true;
@@ -621,6 +654,17 @@
                 } catch (error) {
                     console.error('Error during form submission:', error);
                     let errorMessage = error.message || 'There was an error submitting your registration. Please try again or contact support if the problem persists.';
+                    // GA4: registration submit error
+                    if (window.safeLogEvent) {
+                        try {
+                            const pm = (typeof formObject !== 'undefined' && formObject && formObject.paymentMethod) ? formObject.paymentMethod : (document.querySelector('input[name="paymentMethod"]:checked')?.value || 'unknown');
+                            window.safeLogEvent('registration_submit_error', {
+                                error_message: (error && error.message) ? String(error.message).substring(0, 100) : 'unknown',
+                                payment_method: pm,
+                                page_location: window.location.href
+                            });
+                        } catch (_) {}
+                    }
                     
                     Swal.fire({
                         title: 'Notice',
