@@ -240,7 +240,7 @@
                         </div>
                         
                         <button type="button" class="cta bank-confirm-btn" id="confirmBankTransfer" style="display: none; margin-top: 1rem;">
-                            I've made an EFT
+                            I've made an the transfer
                         </button>
                     </div>
 
@@ -337,6 +337,8 @@
             const confirmBankTransfer = document.getElementById('confirmBankTransfer');
             const submitBtn = document.getElementById('submitBtn');
             const registrationForm = document.getElementById('registrationForm');
+            const paypalCard = document.querySelector('.payment-card.paypal');
+            const paystackCard = document.querySelector('.payment-card.paystack');
             
             if (!registrationForm || !submitBtn) {
                 console.error('Form or submit button not found!');
@@ -380,6 +382,9 @@
                     // Ensure visibility and focus when switching to EFT
                     bankDetailsPanel.scrollIntoView({ behavior: 'smooth', block: 'center' });
                     setTimeout(() => { if (eftRefInput) eftRefInput.focus(); }, 200);
+                    // Hide other payment cards when EFT is selected
+                    if (paypalCard) paypalCard.style.display = 'none';
+                    if (paystackCard) paystackCard.style.display = 'none';
                 } else {
                     // Hide EFT-specific UI and clear state
                     eftReferenceGroup.style.display = 'none';
@@ -391,6 +396,21 @@
                         eftRefInput.value = '';
                     }
                     if (hiddenRefInput) hiddenRefInput.value = '';
+
+                    // Toggle PayPal/Paystack cards based on selection
+                    if (method === 'paypal') {
+                        if (paypalCard) paypalCard.style.display = 'block';
+                        if (paystackCard) paystackCard.style.display = 'none';
+                        if (paypalCard) paypalCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    } else if (method === 'paystack') {
+                        if (paystackCard) paystackCard.style.display = 'block';
+                        if (paypalCard) paypalCard.style.display = 'none';
+                        if (paystackCard) paystackCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    } else {
+                        // For any other method, hide both
+                        if (paypalCard) paypalCard.style.display = 'none';
+                        if (paystackCard) paystackCard.style.display = 'none';
+                    }
                 }
             }
 
