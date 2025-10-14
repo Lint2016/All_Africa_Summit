@@ -307,7 +307,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const fd = new FormData(formEl);
                 const email = (fd.get('email') || '').toString().trim();
                 if (!email) {
-                    await Swal.fire({ icon: 'info', title: 'Email required', text: 'Please fill your email before paying.', confirmButtonColor: '#b25538' });
+                    await Swal.fire({ icon: 'info', title: 'Email required', text: 'Please fill your email in the form before paying.', confirmButtonColor: '#b25538' });
                     return;
                 }
 
