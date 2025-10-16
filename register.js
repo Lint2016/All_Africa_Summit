@@ -194,102 +194,18 @@ document.addEventListener('DOMContentLoaded', function() {
     // PayPal integration
     if (paypalBtn) {
         paypalBtn.addEventListener('click', async () => {
-            // Declare swalInstance in the outer scope
-            let swalInstance = null;
-            
             try {
-                if (!app) {
-                    throw new Error('Firebase not initialized');
-                }
-                
-                // Show loading state
-                if (window.Swal) {
-                    swalInstance = Swal.fire({
-                        title: 'Preparing Payment',
-                        text: 'Please wait while we connect to PayPal...',
-                        allowOutsideClick: false,
-                        didOpen: () => {
-                            Swal.showLoading();
-                        }
-                    });
-                }
-                
-                const createOrder = functions.httpsCallable('createOrder');
-                console.log('Sending createOrder request...');
-                
-                const currentUrl = window.location.href.split('?')[0];
-                const result = await createOrder({ 
-                    amount: '0.50', 
-                    currency: 'USD',
-                    returnUrl: `${currentUrl}?paypal=return`,
-                    cancelUrl: `${currentUrl}?paypal=cancel`
-                });
-                
-                console.log('Order created:', result);
-                
-                // Close loading state
-                if (swalInstance) {
-                    await swalInstance.close();
-                }
-                
-                if (result && result.data && result.data.id) {
-                    // First, save the order ID in session storage
-                    sessionStorage.setItem('paypal_order_id', result.data.id);
-                    
-                    // Get the approval URL from the response
-                    const approvalLink = result.data.links?.find(link => 
-                        link.rel === 'approve' && link.method === 'GET'
-                    );
-                    
-                    if (approvalLink && approvalLink.href) {
-                        const approvalUrl = approvalLink.href;
-                        // Show confirmation before redirecting to PayPal
-                        if (window.Swal) {
-                            const { isConfirmed } = await Swal.fire({
-                                title: 'Redirecting to PayPal',
-                                text: 'You will be redirected to PayPal to complete your payment of $120.00',
-                                icon: 'info',
-                                showCancelButton: true,
-                                confirmButtonColor: '#b25538',
-                                cancelButtonColor: '#6c757d',
-                                confirmButtonText: 'Proceed to PayPal',
-                                cancelButtonText: 'Cancel',
-                                reverseButtons: true
-                            });
-                            
-                            if (isConfirmed) {
-                                // Redirect to PayPal's approval URL
-                                window.location.href = approvalUrl;
-                            }
-                        } else {
-                            // If SweetAlert is not available, just redirect
-                            window.location.href = approvalUrl;
-                        }
-                    } else {
-                        throw new Error('No approval URL found in PayPal response');
-                    }
-                } else {
-                    throw new Error('Invalid response from server');
-                }
-            } catch (err) {
-                console.error('Create order error:', err);
-                
-                // Close loading state if it's still open
-                if (swalInstance) {
-                    await swalInstance.close();
-                }
-                
-                // Show error message
                 if (window.Swal) {
                     await Swal.fire({
-                        icon: 'error',
-                        title: 'Payment Error',
-                        text: 'Error creating PayPal order: ' + (err.message || 'Unknown error'),
+                        icon: 'info',
+                        title: 'PayPal payment via link',
+                        html: 'We will send you a PayPal payment link after you submit your registration.<br><br>Please complete the form first and click Submit.',
                         confirmButtonColor: '#b25538'
                     });
-                } else {
-                    alert('Error creating PayPal order: ' + (err.message || 'Unknown error'));
                 }
+                if (submitBtn) submitBtn.disabled = false;
+            } catch (err) {
+                console.error('PayPal info prompt error:', err);
             }
         });
     }
@@ -374,8 +290,8 @@ document.addEventListener('DOMContentLoaded', function() {
             const fd = new FormData(formEl);
             const selectedPaymentMethod = (fd.get('paymentMethod') || '').toLowerCase();
 
-            // For EFT, allow submit without online payment approval
-            const requiresOnlinePayment = selectedPaymentMethod !== 'eft';
+            // For EFT and manual PayPal link, allow submit without online payment approval
+            const requiresOnlinePayment = selectedPaymentMethod !== 'eft' && selectedPaymentMethod !== 'paypal';
             if (requiresOnlinePayment && !paymentApproved) {
                 if (window.Swal) {
                     await Swal.fire({
