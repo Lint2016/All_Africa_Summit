@@ -343,9 +343,11 @@ document.addEventListener('DOMContentLoaded', function() {
                         createdAt: nowIso
                     };
 
-                    if (selectedPaymentMethod === 'eft') {
+                    // Treat PayPal like EFT (manual reconciliation) -> pending
+                    if (selectedPaymentMethod === 'eft' || selectedPaymentMethod === 'paypal') {
                         paymentDoc.paymentStatus = 'pending';
                     } else {
+                        // Paystack remains completed after online approval
                         paymentDoc.paymentStatus = 'completed';
                         paymentDoc.paymentAmount = '120.00';
                     }
