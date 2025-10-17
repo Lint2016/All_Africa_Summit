@@ -129,6 +129,12 @@ img {
   margin-bottom: 40px;
 }
 
+/* Ensure embedded map spans full container width */
+.map-container iframe {
+  width: 100%;
+  display: block;
+}
+
 .transportation h4 {
   text-align: center;
   margin-bottom: 30px;
@@ -656,6 +662,12 @@ img {
   grid-template-columns: repeat(4, 1fr);
   gap: 30px;
   margin-top: 50px;
+}
+
+/* Centered CTA for speakers section */
+.speakers-cta {
+  text-align: center;
+  margin: 16px 0 28px;
 }
 
 @media (max-width: 1024px) {
@@ -1274,6 +1286,14 @@ img {
   
   .hero h1 {
     font-size: 2.2rem;
+    word-break: break-word;           /* allow breaking long words */
+    overflow-wrap: anywhere;          /* ensure last characters don't clip */
+  }
+  
+  /* Add extra horizontal padding and account for device safe areas */
+  .hero-content {
+    padding-left: calc(24px + env(safe-area-inset-left));
+    padding-right: calc(24px + env(safe-area-inset-right));
   }
   
   .countdown-item {
