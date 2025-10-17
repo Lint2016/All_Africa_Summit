@@ -633,6 +633,11 @@ img {
   text-align: center;
 }
 
+/* Ensure readable body text inside light panels */
+.highlight-box p {
+  color: var(--color-text);
+}
+
 .highlight-box ul {
   list-style: none;
   padding: 0;
