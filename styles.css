@@ -12,9 +12,8 @@
   --box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
   --nav-height-mobile: 70px;   /* Standard mobile navbar height */
   /* Default hero image; update this to point to any file in images/ */
-  --hero-image: url('images/worshipConcert.png');
-}
-
+  --hero-image: url('images/2026sum.jpeg')
+    }
 * {
   margin: 0;
   padding: 0;
