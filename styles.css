@@ -375,6 +375,14 @@ img {
   background-attachment: fixed;
 }
 
+/* Desktop: ensure hero content clears the fixed navbar and avoid parallax overlap */
+@media (min-width: 992px) {
+  .hero {
+    padding-top: 120px;
+    background-attachment: scroll;
+  }
+}
+
 /* Top scrim to blend hero into navbar while keeping background logo visible */
 .hero::before {
   content: '';
