@@ -250,37 +250,6 @@
                 <div class="payment-options">
                     <h3 class="payment-options-title">Payment Options</h3>
                     
-                    <!-- PayPal Option -->
-                    <div class="payment-card paypal" data-payment-method="paypal">
-                        <img src="https://www.paypalobjects.com/webstatic/icon/pp258.png" alt="PayPal Logo">
-                        <p>Pay securely with PayPal</p>
-                        <div id="paypal-container-MTXEN6XKCQGWN"></div>
-                        <script src="https://www.paypal.com/sdk/js?client-id=BAA-Tkivv3F1L_38LdqD77MGE30Q5qblovkCD18s_wu-LzIO-Idbb_0BJa8uMBCf-G7y0PmanL5tdqFFd4&components=hosted-buttons&disable-funding=venmo&currency=USD"></script>
-                        <script>
-                          if (window.paypal && paypal.HostedButtons) {
-                            paypal.HostedButtons({
-                              hostedButtonId: "MTXEN6XKCQGWN",
-                            }).render("#paypal-container-MTXEN6XKCQGWN");
-                          }
-                        </script>
-                        <p style="margin-top: 0.75rem; font-size: 0.95rem; color:#333;">
-                          Please <strong>complete your payment first</strong> using the PayPal section above, then return to this page to
-                          <strong>fill and submit the registration form</strong>.
-                        </p>
-                        <div style="margin-top: 0.5rem; background:#f7f7f9; border:1px solid #e5e5ea; border-radius:8px; padding:10px; color:#333; font-size:0.92rem;">
-                          <div style="font-weight:600; margin-bottom:6px;">Choose the right option:</div>
-                          <div style="margin-bottom:4px;">• <strong>PayPal</strong>: Use this if you already have a PayPal account (you will be asked to sign in).</div>
-                          <div>• <strong>Checkout</strong>: Use this if you want to pay by <strong>debit/credit card</strong> (no PayPal account required) or still pay with PayPal.</div>
-                        </div>
-                    </div>
-
-                     <!-- PayStack Option -->
-                    <div class="payment-card paystack" data-payment-method="paystack">
-                        <img src="images/Paystack-mark-white-twitter.png" alt="PayStack Logo">
-                        <p>Pay securely with PayStack</p>
-                        <button type="button" class="cta payfast-btn select-payment">Pay with PayStack</button>
-                    </div>
-
                     <!-- Bank Transfer Option -->
                     <div class="payment-card bank-transfer" data-payment-method="bank">
                         <img src="images/fnb_logo.png" alt="Bank Transfer Logo">
@@ -327,6 +296,38 @@
                             
                         </div>
                     </div>
+                    <!-- PayPal Option -->
+                    <div class="payment-card paypal" data-payment-method="paypal">
+                        <img src="https://www.paypalobjects.com/webstatic/icon/pp258.png" alt="PayPal Logo">
+                        <p>Pay securely with PayPal</p>
+                        <div id="paypal-container-MTXEN6XKCQGWN"></div>
+                        <script src="https://www.paypal.com/sdk/js?client-id=BAA-Tkivv3F1L_38LdqD77MGE30Q5qblovkCD18s_wu-LzIO-Idbb_0BJa8uMBCf-G7y0PmanL5tdqFFd4&components=hosted-buttons&disable-funding=venmo&currency=USD"></script>
+                        <script>
+                          if (window.paypal && paypal.HostedButtons) {
+                            paypal.HostedButtons({
+                              hostedButtonId: "MTXEN6XKCQGWN",
+                            }).render("#paypal-container-MTXEN6XKCQGWN");
+                          }
+                        </script>
+                        <p style="margin-top: 0.75rem; font-size: 0.95rem; color:#333;">
+                          Please <strong>complete your payment first</strong> using the PayPal section above, then return to this page to
+                          <strong>fill and submit the registration form</strong>.
+                        </p>
+                        <div style="margin-top: 0.5rem; background:#f7f7f9; border:1px solid #e5e5ea; border-radius:8px; padding:10px; color:#333; font-size:0.92rem;">
+                          <div style="font-weight:600; margin-bottom:6px;">Choose the right option:</div>
+                          <div style="margin-bottom:4px;">• <strong>PayPal</strong>: Use this if you already have a PayPal account (you will be asked to sign in).</div>
+                          <div>• <strong>Checkout</strong>: Use this if you want to pay by <strong>debit/credit card</strong> (no PayPal account required) or still pay with PayPal.</div>
+                        </div>
+                    </div>
+
+                     <!-- PayStack Option -->
+                    <div class="payment-card paystack" data-payment-method="paystack">
+                        <img src="images/Paystack-mark-white-twitter.png" alt="PayStack Logo">
+                        <p>Pay securely with PayStack</p>
+                        <button type="button" class="cta payfast-btn select-payment">Pay with PayStack</button>
+                    </div>
+
+                    
                 </div>
             </div>
 
