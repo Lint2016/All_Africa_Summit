@@ -661,6 +661,64 @@ img {
   font-weight: bold;
 }
 
+.accordion {
+  display: grid;
+  gap: 12px;
+}
+
+.accordion-item {
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: var(--border-radius);
+  overflow: hidden;
+}
+
+.accordion-button {
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  border: 0;
+  padding: 16px 48px 16px 16px;
+  font-weight: 600;
+  color: var(--color-primary);
+  cursor: pointer;
+  position: relative;
+  transition: var(--transition);
+}
+
+.accordion-button:hover {
+  background: rgba(222, 204, 162, 0.08);
+}
+
+.accordion-button::after {
+  content: '▾';
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%) rotate(0deg);
+  transition: var(--transition);
+  color: var(--color-secondary);
+  font-size: 1.1rem;
+}
+
+.accordion-button[aria-expanded="true"]::after {
+  transform: translateY(-50%) rotate(180deg);
+}
+
+.accordion-button:focus-visible {
+  outline: 2px solid var(--color-secondary);
+  outline-offset: 2px;
+}
+
+.accordion-panel {
+  padding: 0 16px 16px 16px;
+  color: var(--color-text);
+}
+
+.accordion-panel p {
+  margin: 0;
+}
+
 /* ===== Speakers Section ===== */
 .speakers-grid {
   display: grid;

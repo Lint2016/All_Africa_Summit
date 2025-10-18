@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', function() {
+function initSiteScripts() {
     // Mobile Navigation Toggle
     const hamburger = document.querySelector('.hamburger');
     const navLinks = document.querySelector('.nav-links');
@@ -49,33 +49,37 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Countdown Timer
+    const daysEl = document.getElementById('days');
+    const hoursEl = document.getElementById('hours');
+    const minutesEl = document.getElementById('minutes');
+    const secondsEl = document.getElementById('seconds');
+    const hasCountdown = daysEl && hoursEl && minutesEl && secondsEl;
+
     const countdown = () => {
         const countDate = new Date('February 25, 2026 09:00:00').getTime();
         const now = new Date().getTime();
         const gap = countDate - now;
 
-        // Time calculations
         const second = 1000;
         const minute = second * 60;
         const hour = minute * 60;
         const day = hour * 24;
 
-        // Calculate remaining time
-        const textDay = Math.floor(gap / day);
-        const textHour = Math.floor((gap % day) / hour);
-        const textMinute = Math.floor((gap % hour) / minute);
-        const textSecond = Math.floor((gap % minute) / second);
+        const textDay = Math.max(0, Math.floor(gap / day));
+        const textHour = Math.max(0, Math.floor((gap % day) / hour));
+        const textMinute = Math.max(0, Math.floor((gap % hour) / minute));
+        const textSecond = Math.max(0, Math.floor((gap % minute) / second));
 
-        // Update the countdown display
-        document.getElementById('days').textContent = textDay.toString().padStart(2, '0');
-        document.getElementById('hours').textContent = textHour.toString().padStart(2, '0');
-        document.getElementById('minutes').textContent = textMinute.toString().padStart(2, '0');
-        document.getElementById('seconds').textContent = textSecond.toString().padStart(2, '0');
+        if (daysEl) daysEl.textContent = textDay.toString().padStart(2, '0');
+        if (hoursEl) hoursEl.textContent = textHour.toString().padStart(2, '0');
+        if (minutesEl) minutesEl.textContent = textMinute.toString().padStart(2, '0');
+        if (secondsEl) secondsEl.textContent = textSecond.toString().padStart(2, '0');
     };
 
-    // Run countdown every second
-    setInterval(countdown, 1000);
-    countdown(); // Initial call
+    if (hasCountdown) {
+        setInterval(countdown, 1000);
+        countdown();
+    }
 
     // Tab functionality for schedule
     const scheduleTabs = document.querySelectorAll('.schedule-tabs .tab-btn');
@@ -205,6 +209,28 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
+    const accordions = document.querySelectorAll('.accordion');
+    accordions.forEach(acc => {
+        const buttons = acc.querySelectorAll('.accordion-button');
+        buttons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const panelId = btn.getAttribute('aria-controls');
+                const panel = document.getElementById(panelId);
+                const expanded = btn.getAttribute('aria-expanded') === 'true';
+                buttons.forEach(b => {
+                    if (b !== btn) {
+                        const pid = b.getAttribute('aria-controls');
+                        const p = document.getElementById(pid);
+                        b.setAttribute('aria-expanded', 'false');
+                        if (p) p.hidden = true;
+                    }
+                });
+                btn.setAttribute('aria-expanded', expanded ? 'false' : 'true');
+                if (panel) panel.hidden = expanded;
+            });
+        });
+    });
+
     // GA4: Enter Site modal button click
     const enterBtn = document.getElementById('enterButton');
     if (enterBtn) {
@@ -229,6 +255,12 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
-});
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initSiteScripts);
+} else {
+    initSiteScripts();
+}
 
 // Payment functionality moved to register.html page
