@@ -196,10 +196,10 @@
                           <input type="radio" name="paymentMethod" value="paypal">
                           PayPal
                         </label>
-                        <label style="display: inline-flex; align-items: center; margin-right: 1rem; gap: 0.4rem;">
+                        <!--<label style="display: inline-flex; align-items: center; margin-right: 1rem; gap: 0.4rem;">
                           <input type="radio" name="paymentMethod" value="paystack">
                           Paystack
-                        </label>
+                        </label>-->
                       </div>
                     </fieldset>
 
@@ -300,13 +300,13 @@
                     <div class="payment-card paypal" data-payment-method="paypal">
                         <img src="https://www.paypalobjects.com/webstatic/icon/pp258.png" alt="PayPal Logo">
                         <p>Pay securely with PayPal</p>
-                        <div id="paypal-container-MTXEN6XKCQGWN"></div>
-                        <script src="https://www.paypal.com/sdk/js?client-id=BAA-Tkivv3F1L_38LdqD77MGE30Q5qblovkCD18s_wu-LzIO-Idbb_0BJa8uMBCf-G7y0PmanL5tdqFFd4&components=hosted-buttons&disable-funding=venmo&currency=USD"></script>
+                        <div id="paypal-container-NRQ4Q8WFSWDGY"></div>
+                        <script src="https://www.paypal.com/sdk/js?client-id=BAAALuugTREJErZm9W6Irusm6xbhYB2JY2O_NEHq5u-S8h7tzQMdRByPP-SUN_QftmHHf8bV3S0UP7h8HI&components=hosted-buttons&disable-funding=venmo&currency=USD"></script>
                         <script>
                           if (window.paypal && paypal.HostedButtons) {
                             paypal.HostedButtons({
-                              hostedButtonId: "MTXEN6XKCQGWN",
-                            }).render("#paypal-container-MTXEN6XKCQGWN");
+                              hostedButtonId: "NRQ4Q8WFSWDGY",
+                            }).render("#paypal-container-NRQ4Q8WFSWDGY");
                           }
                         </script>
                         <p style="margin-top: 0.75rem; font-size: 0.95rem; color:#333;">
@@ -320,12 +320,12 @@
                         </div>
                     </div>
 
-                     <!-- PayStack Option -->
+                     <!-- PayStack Option 
                     <div class="payment-card paystack" data-payment-method="paystack">
                         <img src="images/Paystack-mark-white-twitter.png" alt="PayStack Logo">
                         <p>Pay securely with PayStack</p>
                         <button type="button" class="cta payfast-btn select-payment">Pay with PayStack</button>
-                    </div>
+                    </div> -->
 
                     
                 </div>
