@@ -217,7 +217,9 @@ img {
   cursor: pointer;
   font-size: 0.9rem;
 }
-
+#accBtn{
+  text-align: center;
+}
 .btn-primary {
   background-color: var(--color-secondary);
   color: white;
