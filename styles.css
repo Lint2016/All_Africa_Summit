@@ -380,7 +380,7 @@ img {
   color: white;
   position: relative;
   padding-top: 80px;
-  background-attachment: fixed;
+  background-attachment: scroll;/*this allow a proper display on IOS*/
 }
 
 /* Desktop: ensure hero content clears the fixed navbar and avoid parallax overlap */
