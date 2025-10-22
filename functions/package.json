@@ -14,6 +14,7 @@
   },
   "main": "index.js",
   "dependencies": {
+    "@dataconnect/generated": "file:src/dataconnect-generated",
     "@paypal/checkout-server-sdk": "^1.0.3",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",

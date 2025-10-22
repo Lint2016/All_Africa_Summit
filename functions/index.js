@@ -13,11 +13,7 @@ function environment() {
   let clientId = process.env.PAYPAL_CLIENT_ID || "";
   let clientSecret = process.env.PAYPAL_CLIENT_SECRET || "";
 
-  // If not found in environment variables, try config (v1)
-  if ((!clientId || !clientSecret) && functions.config().paypal) {
-    clientId = functions.config().paypal.client_id || "";
-    clientSecret = functions.config().paypal.client_secret || "";
-  }
+  // v2: functions.config() removed; rely solely on environment variables
 
   // Remove any whitespace that might be present
   clientId = clientId.trim();
@@ -115,6 +111,209 @@ exports.createOrder = functions.https.onCall(async (data) => {
     }
     console.error("PayPal createOrder error:", err);
     throw new functions.https.HttpsError("internal", err.message);
+  }
+});
+
+exports.createOzowPaymentHttp = functions.https.onRequest(async (req, res) => {
+  const allowOrigin = req.headers.origin || '*';
+  res.set("Access-Control-Allow-Origin", allowOrigin);
+  res.set("Vary", "Origin");
+  res.set("Access-Control-Allow-Methods", "POST, OPTIONS");
+  res.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  if (req.method === "OPTIONS") {
+    res.status(204).send(""); return;
+  }
+  if (req.method !== "POST") {
+    res.status(405).send("Method Not Allowed"); return;
+  }
+  try {
+    const db = admin.firestore();
+    const siteCode = (process.env.OZOW_SITE_CODE || "").trim();
+    const privateKey = (process.env.OZOW_PRIVATE_KEY || "").trim();
+    // eslint-disable-next-line max-len
+    const successUrl = (process.env.OZOW_SUCCESS_URL || "https://aaasummit.co.za/register.html?ozow=success").trim();
+    // eslint-disable-next-line max-len
+    const cancelUrl = (process.env.OZOW_CANCEL_URL || "https://aaasummit.co.za/register.html?ozow=cancel").trim();
+    const notifyUrl = (process.env.OZOW_NOTIFY_URL || "").trim();
+    const errorUrl = (process.env.OZOW_ERROR_URL || "https://aaasummit.co.za/register.html?ozow=error").trim();
+    let body = {};
+    if (req.body) {
+      if (typeof req.body === "object") {
+        body = req.body;
+      } else if (typeof req.body === "string") {
+        try { body = JSON.parse(req.body); } catch (_) { body = {}; }
+      }
+    }
+    const amount = String(body.amount || "1.00").trim();
+    const currencyCode = String(body.currencyCode || "ZAR").trim().toUpperCase();
+    const countryCode = String(body.countryCode || "ZA").trim().toUpperCase();
+    const customer = body.customer || {};
+    let firstName = String(customer.firstName || body.firstName || '').trim();
+    let lastName = String(customer.lastName || body.lastName || '').trim();
+    let email = String(customer.email || body.email || '').trim();
+    if (!firstName && (customer.fullName || body.fullName)) {
+      const parts = String(customer.fullName || body.fullName).trim().split(/\s+/);
+      firstName = parts[0] || '';
+      if (!lastName && parts.length > 1) lastName = parts.slice(1).join(" ");
+    }
+    // Normalize email to ensure we have it if provided under different keys
+    if (!email && typeof body.emailAddress === "string") {
+      email = String(body.emailAddress).trim();
+    }
+    if (!siteCode) { res.status(500).json({error: "Missing siteCode"}); return; }
+    if (!privateKey) { res.status(500).json({error: "Missing private key"}); return; }
+    if (!email) { res.status(400).json({error: "Missing email"}); return; }
+    if (!firstName) { firstName = (email.split('@')[0] || 'Guest'); }
+    if (!/^\d+(\.\d{1,2})?$/.test(amount)) {
+      res.status(400).json({error: "Invalid amount"}); return;
+    }
+    const rawTx = String(body.transactionReference || ("INV-" + Date.now())).trim();
+    const rawBankRef = String(body.bankReference || "AAA-2026").trim();
+    const sanitize = (s) => s.replace(/[^0-9A-Za-z]/g, "").toUpperCase().slice(0, 20);
+    const transactionReference = sanitize(rawTx) || ("INV" + Date.now());
+    const nameBaseRaw = firstName ? (firstName + (lastName ? lastName[0] : "")) : (email ? email.split('@')[0] : "");
+    const nameRef = nameBaseRaw ? sanitize("AAAS" + nameBaseRaw) : "";
+    const bankReferenceSafe = nameRef || (sanitize(rawBankRef) || "AAA2026");
+    const payload = {
+      siteCode,
+      countryCode,
+      currencyCode,
+      amount,
+      transactionReference,
+      bankReference: bankReferenceSafe,
+      cancelUrl,
+      successUrl,
+      errorUrl,
+      ...(notifyUrl ? { notifyUrl } : {}),
+    };
+    const canonical = JSON.stringify(payload);
+    const hash = crypto.createHmac('sha256', privateKey).update(canonical).digest('hex');
+    const fields = { ...payload, hash };
+    await db.collection('payments').doc(transactionReference).set({
+      gateway: 'ozow', amount, currencyCode, countryCode, bankReference: bankReferenceSafe,
+      customer: { firstName, lastName, email }, status: 'initiated',
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+    }, { merge: true });
+    res.status(200).json({ redirectPost: { url: 'https://pay.ozow.com/', fields } });
+  } catch (e) {
+    res.status(500).json({ error: e && e.message ? e.message : 'Server error' });
+  }
+});
+
+exports.createOzowPayment = functions.https.onCall(async (data) => {
+  try {
+    if (!data) throw new functions.https.HttpsError("invalid-argument", "Missing data");
+    const db = admin.firestore();
+    const siteCode = (process.env.OZOW_SITE_CODE || "").trim();
+    const privateKey = (process.env.OZOW_PRIVATE_KEY || "").trim();
+    const successUrl = (process.env.OZOW_SUCCESS_URL || "https://aaasummit.co.za/register.html?ozow=success").trim();
+    const cancelUrl = (process.env.OZOW_CANCEL_URL || "https://aaasummit.co.za/register.html?ozow=cancel").trim();
+    const notifyUrl = (process.env.OZOW_NOTIFY_URL || "").trim();
+    const amount = String(data.amount || "1.00").trim();
+    const currencyCode = String(data.currencyCode || "ZAR").trim().toUpperCase();
+    const countryCode = String(data.countryCode || "ZA").trim().toUpperCase();
+    const bankReference = String(data.bankReference || "AAA-2026").trim();
+    const customer = data.customer || {};
+    let firstName = String(customer.firstName || data.firstName || "").trim();
+    let lastName = String(customer.lastName || data.lastName || "").trim();
+    if (!firstName && (customer.fullName || data.fullName)) {
+      const parts = String(customer.fullName || data.fullName).trim().split(/\s+/);
+      firstName = parts[0] || "";
+      if (!lastName && parts.length > 1) lastName = parts.slice(1).join(" ");
+    }
+    let email = String(customer.email || data.email || "").trim();
+    if (!email && typeof data.emailAddress === "string") {
+      email = String(data.emailAddress).trim();
+    }
+    try {
+      console.log("[createOzowPayment] raw data:", JSON.stringify(data));
+    } catch (_) {
+      console.log("[createOzowPayment] raw data: [unserializable]");
+    }
+    try {
+      console.log("[createOzowPayment] received fields:", {
+        customer,
+        topLevelFirstName: data.firstName || null,
+        topLevelLastName: data.lastName || null,
+        topLevelEmail: data.email || null,
+        emailAddress: typeof data.emailAddress === "string" ? data.emailAddress : null,
+      });
+      console.log("[createOzowPayment] computed customer:", { firstName, lastName, email });
+    } catch (_) {
+      // ignore logging errors
+    }
+    // eslint-disable-next-line max-len
+    if (!email) throw new functions.https.HttpsError("invalid-argument", "Missing email");
+    if (!firstName) { firstName = (email.split('@')[0] || "Guest"); }
+    if (!siteCode) throw new functions.https.HttpsError("failed-precondition", "Missing siteCode");
+    // eslint-disable-next-line max-len
+    if (!privateKey) throw new functions.https.HttpsError("failed-precondition", "Missing private key");
+    // eslint-disable-next-line max-len
+    if (!/^\d+(\.\d{1,2})?$/.test(amount)) throw new functions.https.HttpsError("invalid-argument", "Invalid amount");
+    const sanitize = (s) => s.replace(/[^0-9A-Za-z]/g, "").toUpperCase().slice(0, 20);
+    const txBase = String(data.transactionReference || ("INV-" + Date.now())).trim();
+    const brBase = String(data.bankReference || "AAA-2026").trim();
+    const transactionReference = sanitize(txBase) || ("INV" + Date.now());
+    const bankReferenceSafe = sanitize(brBase) || "AAA2026";
+    const payload = {
+      siteCode,
+      countryCode,
+      currencyCode,
+      amount,
+      transactionReference,
+      bankReference: bankReferenceSafe,
+      cancelUrl: cancelUrl,
+      successUrl: successUrl,
+      errorUrl: errorUrl,
+      ...(notifyUrl ? {notifyUrl} : {}),
+    };
+    const canonical = JSON.stringify(payload);
+    const hash = crypto.createHmac("sha256", privateKey).update(canonical).digest("hex");
+    const fields = {...payload, hash};
+    await db.collection("payments").doc(transactionReference).set({
+      gateway: "ozow",
+      amount,
+      currencyCode,
+      countryCode,
+      bankReference: bankReferenceSafe,
+      customer: {firstName, lastName, email},
+      status: "initiated",
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+    }, {merge: true});
+    return {redirectPost: {url: "https://pay.ozow.com/", fields}};
+  } catch (err) {
+    if (err instanceof functions.https.HttpsError) throw err;
+    // eslint-disable-next-line max-len
+    throw new functions.https.HttpsError("internal", err && err.message ? err.message : "Unknown error");
+  }
+});
+
+exports.ozowNotify = functions.https.onRequest(async (req, res) => {
+  try {
+    if (req.method !== "POST") {
+      res.status(405).send("Method Not Allowed");
+      return;
+    }
+    const privateKey = (process.env.OZOW_PRIVATE_KEY || "").trim();
+    if (!privateKey) {
+      res.status(500).send("Missing private key");
+      return;
+    }
+    const body = req.body || {};
+    const tx = String(body.transactionReference || "").trim();
+    if (!tx) {
+      res.status(400).send("Missing transactionReference");
+      return;
+    }
+    const db = admin.firestore();
+    await db.collection("payments").doc(tx).set({
+      status: String(body.status || "unknown").toLowerCase(),
+      raw: body,
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    }, { merge: true });
+    res.status(200).send("OK");
+  } catch (e) {
+    res.status(500).send("Server error");
   }
 });
 
