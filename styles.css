@@ -1977,3 +1977,177 @@ img {
 .swal2-confirm:focus {
   box-shadow: 0 0 0 3px rgba(178, 85, 56, 0.3) !important;
 }
+
+/* ============================================
+   SCROLL REVEAL ANIMATIONS
+   ============================================ */
+
+/* Base scroll reveal styles */
+.scroll-reveal {
+  opacity: 0;
+  transition: opacity 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+              transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  will-change: opacity, transform;
+}
+
+.scroll-reveal.revealed {
+  opacity: 1;
+  transform: translateY(0) translateX(0) scale(1);
+}
+
+/* Fade Up Animation */
+.reveal-fade-up {
+  transform: translateY(50px);
+}
+
+.reveal-fade-up.revealed {
+  transform: translateY(0);
+}
+
+/* Fade Down Animation */
+.reveal-fade-down {
+  transform: translateY(-50px);
+}
+
+.reveal-fade-down.revealed {
+  transform: translateY(0);
+}
+
+/* Fade Left Animation */
+.reveal-fade-left {
+  transform: translateX(50px);
+}
+
+.reveal-fade-left.revealed {
+  transform: translateX(0);
+}
+
+/* Fade Right Animation */
+.reveal-fade-right {
+  transform: translateX(-50px);
+}
+
+.reveal-fade-right.revealed {
+  transform: translateX(0);
+}
+
+/* Fade In Only (no movement) */
+.reveal-fade {
+  transform: none;
+}
+
+/* Scale Up Animation */
+.reveal-scale {
+  transform: scale(0.8);
+}
+
+.reveal-scale.revealed {
+  transform: scale(1);
+}
+
+/* Scale Up with Fade */
+.reveal-scale-fade {
+  transform: scale(0.8);
+}
+
+.reveal-scale-fade.revealed {
+  transform: scale(1);
+}
+
+/* Rotate In Animation */
+.reveal-rotate {
+  transform: rotate(-10deg) scale(0.9);
+}
+
+.reveal-rotate.revealed {
+  transform: rotate(0deg) scale(1);
+}
+
+/* Slide Up with Stagger (for grids) */
+.reveal-stagger {
+  transform: translateY(30px);
+}
+
+.reveal-stagger.revealed {
+  transform: translateY(0);
+}
+
+/* Blur Fade Animation */
+.reveal-blur {
+  filter: blur(10px);
+  transform: translateY(20px);
+}
+
+.reveal-blur.revealed {
+  filter: blur(0);
+  transform: translateY(0);
+}
+
+/* Hero/Title specific animations */
+.reveal-hero {
+  transform: translateY(80px) scale(0.95);
+  opacity: 0;
+}
+
+.reveal-hero.revealed {
+  transform: translateY(0) scale(1);
+  opacity: 1;
+}
+
+/* Card specific animations */
+.reveal-card {
+  transform: translateY(40px) scale(0.95);
+  opacity: 0;
+}
+
+.reveal-card.revealed {
+  transform: translateY(0) scale(1);
+  opacity: 1;
+}
+
+/* Image specific animations */
+.reveal-image {
+  transform: scale(1.1);
+  opacity: 0;
+  filter: brightness(0.8);
+}
+
+.reveal-image.revealed {
+  transform: scale(1);
+  opacity: 1;
+  filter: brightness(1);
+}
+
+/* Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+  .scroll-reveal {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+  
+  .scroll-reveal.revealed {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
+/* Performance optimizations */
+.scroll-reveal {
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+/* Faster animations on mobile for better performance */
+@media (max-width: 768px) {
+  .scroll-reveal {
+    transition-duration: 0.6s;
+  }
+  
+  .reveal-fade-up,
+  .reveal-fade-down,
+  .reveal-fade-left,
+  .reveal-fade-right {
+    transform: translateY(30px);
+  }
+}
